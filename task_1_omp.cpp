@@ -440,6 +440,8 @@ int main(int argc, char *argv[])
                     } 
                     else
                     {
+                        vis_source.clear();
+                        vis_tag.clear();
                         queue_recv.emplace_back(pii.x);
                         queue_recv.emplace_back(pii.y);
                         tag ++;    
