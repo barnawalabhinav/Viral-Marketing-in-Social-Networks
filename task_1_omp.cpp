@@ -351,10 +351,12 @@ int main(int argc, char *argv[])
 
     for (int k = startk; k <= endk; k++)
     {
-        deque < atomic<int>> queue_send;
-        deque < atomic<int>> queue_recv;
+        deque<int> queue_send;
+        deque<int> queue_recv;
         atomic_int tag(0);
         atomic_int flag(0);
+
+        atomic_int shared(0);
 
         auto it = (*edges).begin();
         while (it != edges->end())
@@ -368,6 +370,7 @@ int main(int argc, char *argv[])
                 deletable->push_back(j);
                 it = edges->erase(it);
                 queue_send.emplace_back(i);
+
                 queue_send.emplace_back(j);
                 queue_recv.emplace_back(i);
                 queue_recv.emplace_back(j);
@@ -385,6 +388,7 @@ int main(int argc, char *argv[])
 
             if (tid == 0)
             {
+                int have_sent = 0;
                 while(flag == 0) {
                     if (queue_send.size() >= 2) {
                         int e1 = queue_send.front();
@@ -397,19 +401,27 @@ int main(int argc, char *argv[])
 
                         for (int i=0; i<size; ++i) {
                             if (i != rank) {
+                                printf("rank %d sent {%d,%d} to %d\n", rank,e1,e2, i);
                                 MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
                             }
                         }
+                        have_sent=0;
                     }else {
-                        Pair pii;
-                        pii.x = -1;
-                        pii.y = -1;
+                        if (shared != 0 || have_sent == 0) {
+                            Pair pii;
+                            pii.x = -1;
+                            pii.y = -1;
+                            printf("tid 0 sent -1\n");
 
-                        for (int i=0; i<size; ++i) {
-                            if (i != rank) {
-                                MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                            for (int i=0; i<size; ++i) {
+                                if (i != rank) {
+                                    printf("rank %d  sent -1 to %d\n", rank, i);
+                                    MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                                }
                             }
+                            have_sent = 1;
                         }
+                        shared = 0;
                     }
                 }
             
@@ -424,6 +436,8 @@ int main(int argc, char *argv[])
                 while(flag == 0) {
                     Pair pii;
                     MPI_Recv(&pii, 1, PairType, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+                    printf("rank %d recvd {%d,%d}\n", rank, pii.x, pii.y);
+
                     if (pii.x == -1) {
                         vis_source.insert(status.MPI_SOURCE);
                         vis_tag.insert(status.MPI_TAG);
@@ -474,6 +488,7 @@ int main(int argc, char *argv[])
                                 edges->erase({w,x});
                                 queue_send.emplace_back(w);
                                 queue_send.emplace_back(x);
+                                shared ++;
                                 tag ++;
                             }
 
@@ -485,6 +500,7 @@ int main(int argc, char *argv[])
                                 edges->erase({y,z});
                                 queue_send.emplace_back(y);
                                 queue_send.emplace_back(z);
+                                shared ++;
                                 tag ++;
                             }
                         }
@@ -493,6 +509,8 @@ int main(int argc, char *argv[])
                 }
 
             }
+            printf("%d flag", flag.load());
+            printf("%d tag", tag.load());
 
         }
         }
