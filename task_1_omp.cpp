@@ -1,5 +1,4 @@
 #include <bits/stdc++.h>
-#include <stdatomic.h>
 #include <mpi.h>
 #include <omp.h>
 
@@ -354,8 +353,8 @@ int main(int argc, char *argv[])
     {
         deque < atomic<int>> queue_send;
         deque < atomic<int>> queue_recv;
-        atomic<int> tag = 0;
-        atomic<int> flag = 0;
+        atomic_int tag(0);
+        atomic_int flag(0);
 
         auto it = (*edges).begin();
         while (it != edges->end())
