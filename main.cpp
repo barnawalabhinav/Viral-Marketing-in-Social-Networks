@@ -777,7 +777,7 @@ int main(int argc, char *argv[])
                                 if ((*visited)[j] == 0)
                                 {
                                     (*trav).push(j);
-                                    (*head)[j] = (*it).first;
+                                    (*head)[j] = tmp_head;
                                     (*visited)[j] = 1;
                                 }
                             }
