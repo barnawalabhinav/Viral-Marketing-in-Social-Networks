@@ -13,117 +13,117 @@ ARGS-1 = \
 	--verbose=1 \
 	--startk=0 \
 	--endk=5 \
-	--inputpath=./test-1/test-input--1.gra \
-	--headerpath=./test-1/test-header--1.dat \
-	--outputpath=./test-1/test-output--1.txt \
+	--inputpath=A2/test-1/test-input--1.gra \
+	--headerpath=A2/test-1/test-header--1.dat \
+	--outputpath=A2/test-1/test-output--1.txt \
 
 ARGS-2 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=5 \
-	--inputpath=./test-2/test-input--2.gra \
-	--headerpath=./test-2/test-header--2.dat \
-	--outputpath=./test-2/test-output--2.txt \
+	--inputpath=A2/test-2/test-input--2.gra \
+	--headerpath=A2/test-2/test-header--2.dat \
+	--outputpath=A2/test-2/test-output--2.txt \
 
 ARGS0 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=10 \
-	--inputpath=./test0/test-input-0.gra \
-	--headerpath=./test0/test-header-0.dat \
-	--outputpath=./test0/test-output-0.txt \
+	--inputpath=A2/test0/test-input-0.gra \
+	--headerpath=A2/test0/test-header-0.dat \
+	--outputpath=A2/test0/test-output-0.txt \
 
 ARGS1 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=10 \
-	--inputpath=./test1/test-input-1.gra \
-	--headerpath=./test1/test-header-1.dat \
-	--outputpath=./test1/test-output-1.txt \
+	--inputpath=A2/test1/test-input-1.gra \
+	--headerpath=A2/test1/test-header-1.dat \
+	--outputpath=A2/test1/test-output-1.txt \
 
 ARGS2 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=8 \
-	--inputpath=./test2/test-input-2.gra \
-	--headerpath=./test2/test-header-2.dat \
-	--outputpath=./test2/test-output-2.txt \
+	--inputpath=A2/test2/test-input-2.gra \
+	--headerpath=A2/test2/test-header-2.dat \
+	--outputpath=A2/test2/test-output-2.txt \
 
 ARGS3 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=5 \
-	--inputpath=./test3/test-input-3.gra \
-	--headerpath=./test3/test-header-3.dat \
-	--outputpath=./test3/test-output-3.txt \
+	--inputpath=A2/test3/test-input-3.gra \
+	--headerpath=A2/test3/test-header-3.dat \
+	--outputpath=A2/test3/test-output-3.txt \
 
 ARGS4 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=6 \
-	--inputpath=./test4/test-input-4.gra \
-	--headerpath=./test4/test-header-4.dat \
-	--outputpath=./test4/test-output-4.txt \
+	--inputpath=A2/test4/test-input-4.gra \
+	--headerpath=A2/test4/test-header-4.dat \
+	--outputpath=A2/test4/test-output-4.txt \
 
 ARGS5 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=8 \
-	--inputpath=./test5/test-input-5.gra \
-	--headerpath=./test5/test-header-5.dat \
-	--outputpath=./test5/test-output-5.txt \
+	--inputpath=A2/test5/test-input-5.gra \
+	--headerpath=A2/test5/test-header-5.dat \
+	--outputpath=A2/test5/test-output-5.txt \
 
 ARGS6 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=1 \
 	--endk=29 \
-	--inputpath=./test6/test-input-6.gra \
-	--headerpath=./test6/test-header-6.dat \
-	--outputpath=./test6/test-output-6.txt \
+	--inputpath=A2/test6/test-input-6.gra \
+	--headerpath=A2/test6/test-header-6.dat \
+	--outputpath=A2/test6/test-output-6.txt \
 
 ARGS7 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=10 \
 	--endk=25 \
-	--inputpath=./test7/test-input-7.gra \
-	--headerpath=./test7/test-header-7.dat \
-	--outputpath=./test7/test-output-7.txt \
+	--inputpath=A2/test7/test-input-7.gra \
+	--headerpath=A2/test7/test-header-7.dat \
+	--outputpath=A2/test7/test-output-7.txt \
 
 ARGS8 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=2 \
 	--endk=6 \
-	--inputpath=./test8/test-input-8.gra \
-	--headerpath=./test8/test-header-8.dat \
-	--outputpath=./test8/test-output-8.txt \
+	--inputpath=A2/test8/test-input-8.gra \
+	--headerpath=A2/test8/test-header-8.dat \
+	--outputpath=A2/test8/test-output-8.txt \
 
 ARGS9 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=3 \
 	--endk=3 \
-	--inputpath=./test9/test-input-9.gra \
-	--headerpath=./test9/test-header-9.dat \
-	--outputpath=./test9/test-output-9.txt \
+	--inputpath=A2/test9/test-input-9.gra \
+	--headerpath=A2/test9/test-header-9.dat \
+	--outputpath=A2/test9/test-output-9.txt \
 
 ARGS10 = \
 	--taskid=1 \
 	--verbose=1 \
 	--startk=3 \
 	--endk=3 \
-	--inputpath=./test10/test-input-10.gra \
-	--headerpath=./test10/test-header-10.dat \
-	--outputpath=./test10/test-output-10.txt \
+	--inputpath=A2/test10/test-input-10.gra \
+	--headerpath=A2/test10/test-header-10.dat \
+	--outputpath=A2/test10/test-output-10.txt \
 
 # A3: TASK 1 Test Cases
 
