@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
                 queue_send.emplace_back(j);
                 queue_recv.emplace_back(i);
                 queue_recv.emplace_back(j);
-                tag++;
+                atomic_fetch_add(&flag, 1);
             }
             else
                 it++;
@@ -461,7 +461,7 @@ int main(int argc, char *argv[])
                         }
                         
                         if (stop) {
-                            flag = 1;
+                            atomic_fetch_add(&flag, 1);
                             cout << "Broken\n";
                             break;
                         }
@@ -491,7 +491,7 @@ int main(int argc, char *argv[])
                         vis_tag.clear();
                         queue_recv.emplace_back(pii.x);
                         queue_recv.emplace_back(pii.y);
-                        tag++;
+                        atomic_fetch_add(&flag, 1);
                     }
                 }
             }
@@ -521,8 +521,8 @@ int main(int argc, char *argv[])
                                 edges->erase({w, x});
                                 queue_send.emplace_back(w);
                                 queue_send.emplace_back(x);
-                                shared++;
-                                tag++;
+                                atomic_fetch_add(&shared, 1);
+                                atomic_fetch_add(&flag, 1);
                             }
 
                             if ((*triangles)[{y, z}].find(i) != (*triangles)[{y, z}].end())
@@ -533,8 +533,8 @@ int main(int argc, char *argv[])
                                 edges->erase({y, z});
                                 queue_send.emplace_back(y);
                                 queue_send.emplace_back(z);
-                                shared++;
-                                tag++;
+                                atomic_fetch_add(&shared, 1);
+                                atomic_fetch_add(&tag, 1);
                             }
                         }
                         // (*neighbors)[i].erase(j);
