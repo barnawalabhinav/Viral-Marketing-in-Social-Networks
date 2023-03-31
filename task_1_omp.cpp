@@ -7,7 +7,8 @@ using namespace std;
 typedef unsigned int uint;
 typedef long long ll;
 
-typedef struct {
+typedef struct
+{
     int x;
     int y;
 } Pair;
@@ -68,7 +69,6 @@ int main(int argc, char *argv[])
     MPI_Datatype PairType;
     MPI_Type_contiguous(2, MPI_INT, &PairType);
     MPI_Type_commit(&PairType);
-
 
     /***************** GET INPUT FROM FILE *****************/
 
@@ -374,23 +374,23 @@ int main(int argc, char *argv[])
                 queue_send.emplace_back(j);
                 queue_recv.emplace_back(i);
                 queue_recv.emplace_back(j);
-                tag ++;
+                tag++;
             }
             else
                 it++;
         }
 
-        
-
-        #pragma omp parallel num_threads(3)
+#pragma omp parallel num_threads(3)
         {
             int tid = omp_get_thread_num();
 
             if (tid == 0)
             {
                 int have_sent = 0;
-                while(flag == 0) {
-                    if (queue_send.size() >= 2) {
+                while (flag == 0)
+                {
+                    if (queue_send.size() >= 2)
+                    {
                         int e1 = queue_send.front();
                         queue_send.pop_front();
                         int e2 = queue_send.front();
@@ -399,24 +399,31 @@ int main(int argc, char *argv[])
                         pii.x = e1;
                         pii.y = e2;
 
-                        for (int i=0; i<size; ++i) {
-                            if (i != rank) {
-                                printf("rank %d sent {%d,%d} to %d\n", rank,e1,e2, i);
-                                MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                        for (int i = 0; i < size; ++i)
+                        {
+                            if (i != rank)
+                            {
+                                printf("rank %d sent {%d,%d} to %d\n", rank, e1, e2, i);
+                                MPI_Send(&pii, 1, PairType, i, tag, MPI_COMM_WORLD);
                             }
                         }
-                        have_sent=0;
-                    }else {
-                        if (shared != 0 || have_sent == 0) {
+                        have_sent = 0;
+                    }
+                    else
+                    {
+                        if (shared != 0 || have_sent == 0)
+                        {
                             Pair pii;
                             pii.x = -1;
                             pii.y = -1;
                             printf("tid 0 sent -1\n");
 
-                            for (int i=0; i<size; ++i) {
-                                if (i != rank) {
+                            for (int i = 0; i < size; ++i)
+                            {
+                                if (i != rank)
+                                {
                                     printf("rank %d  sent -1 to %d\n", rank, i);
-                                    MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                                    MPI_Send(&pii, 1, PairType, i, tag, MPI_COMM_WORLD);
                                 }
                             }
                             have_sent = 1;
@@ -424,47 +431,73 @@ int main(int argc, char *argv[])
                         shared = 0;
                     }
                 }
-            
             }
 
-
-            if (tid == 1) 
+            if (tid == 1)
             {
                 MPI_Status status;
-                set<int>vis_source;
-                set<int>vis_tag;
-                while(flag == 0) {
+                set<int> vis_source;
+                set<int> vis_tag;
+                vector<int> latest_tags(size - 1, -1);
+                while (flag == 0)
+                {
                     Pair pii;
                     MPI_Recv(&pii, 1, PairType, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-                    printf("rank %d recvd {%d,%d}\n", rank, pii.x, pii.y);
+                    printf("rank %d recvd {%d,%d} from %d with tag %d\n", rank, pii.x, pii.y, status.MPI_SOURCE, status.MPI_TAG);
 
-                    if (pii.x == -1) {
-                        vis_source.insert(status.MPI_SOURCE);
-                        vis_tag.insert(status.MPI_TAG);
+                    if (pii.x == -1)
+                    {
+                        assert(status.MPI_TAG >= latest_tags[status.MPI_SOURCE]);
+                        latest_tags[status.MPI_SOURCE] = status.MPI_TAG;
 
-                        if (vis_source.size() == size - 1) {
-                            if (vis_tag.size() == 1 && (*vis_tag.begin()) == tag && queue_send.size() == 0) {
-                                flag = 1;
+                        bool stop = true;
+                        for (int i = 0; i < size - 1; ++i)
+                        {
+                            if (i != rank && latest_tags[i] != tag)
+                            {
+                                stop = false;
                                 break;
-                            }else{
-                                vis_source.clear();
-                                vis_tag.clear();
                             }
                         }
-                    } 
+                        
+                        if (stop) {
+                            flag = 1;
+                            cout << "Broken\n";
+                            break;
+                        }
+
+                        // if (tag == latest_tag && queue_send.size() == 0)
+                        // {
+                        //     flag = 1;
+                        //     break;
+                        // }
+
+                        // vis_source.insert(status.MPI_SOURCE);
+                        // vis_tag.insert(status.MPI_TAG);
+
+                        // if (vis_source.size() == size - 1) {
+                        //     if (vis_tag.size() == 1 && (*vis_tag.begin()) == tag && queue_send.size() == 0) {
+                        //         flag = 1;
+                        //         break;
+                        //     }else{
+                        //         vis_source.clear();
+                        //         vis_tag.clear();
+                        //     }
+                        // }
+                    }
                     else
                     {
                         vis_source.clear();
                         vis_tag.clear();
                         queue_recv.emplace_back(pii.x);
                         queue_recv.emplace_back(pii.y);
-                        tag ++;    
+                        tag++;
                     }
-                    
                 }
-            }    
+            }
 
-            if (tid == 2) {
+            if (tid == 2)
+            {
                 while (flag == 0)
                 {
                     if (queue_recv.size() >= 2)
@@ -482,14 +515,14 @@ int main(int argc, char *argv[])
                             int z = max(j, p);
                             if ((*triangles)[{w, x}].find(j) != (*triangles)[{w, x}].end())
                                 (*triangles)[{w, x}].erase(j);
-                            
+
                             if ((int)(triangles->at({w, x})).size() < k)
                             {
-                                edges->erase({w,x});
+                                edges->erase({w, x});
                                 queue_send.emplace_back(w);
                                 queue_send.emplace_back(x);
-                                shared ++;
-                                tag ++;
+                                shared++;
+                                tag++;
                             }
 
                             if ((*triangles)[{y, z}].find(i) != (*triangles)[{y, z}].end())
@@ -497,22 +530,20 @@ int main(int argc, char *argv[])
 
                             if ((int)(triangles->at({y, z})).size() < k)
                             {
-                                edges->erase({y,z});
+                                edges->erase({y, z});
                                 queue_send.emplace_back(y);
                                 queue_send.emplace_back(z);
-                                shared ++;
-                                tag ++;
+                                shared++;
+                                tag++;
                             }
                         }
-                        (*neighbors)[i].erase(j);
-                        (*neighbors)[j].erase(i);
+                        // (*neighbors)[i].erase(j);
+                        // (*neighbors)[j].erase(i);
+                    }
                 }
-
+                printf("%d flag", flag.load());
+                printf("%d tag", tag.load());
             }
-            printf("%d flag", flag.load());
-            printf("%d tag", tag.load());
-
-        }
         }
         /************ TEST FOR THE OUTPUT CORRECTNESS BEGINS ************/
 
