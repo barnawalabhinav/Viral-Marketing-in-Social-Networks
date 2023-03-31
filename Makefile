@@ -4,7 +4,7 @@
 SEQCC=g++
 MPICC=mpiCC
 MPIRUN=mpirun -np 4
-CFLAGS=-std=c++11 -Wall -O3
+CFLAGS=-std=c++11 -Wall -O3 -fopenmp
 MPI_MAIN=main.cpp
 SEQ_MAIN=ap_seq.cpp
 
@@ -125,6 +125,85 @@ ARGS10 = \
 	--headerpath=./test10/test-header-10.dat \
 	--outputpath=./test10/test-output-10.txt \
 
+# A3: TASK 1 Test Cases
+
+ARGS311 = \
+	--taskid=1 \
+	--verbose=1 \
+	--startk=3 \
+	--endk=10 \
+	--inputpath=A3/test1/test-input-1.gra \
+	--headerpath=A3/test1/test-header-1.dat \
+	--outputpath=A3/test1/task1-output-1.txt \
+
+ARGS312 = \
+	--taskid=1 \
+	--verbose=1 \
+	--startk=3 \
+	--endk=12 \
+	--inputpath=A3/test2/test-input-2.gra \
+	--headerpath=A3/test2/test-header-2.dat \
+	--outputpath=A3/test2/task1-output-2.txt \
+
+ARGS313 = \
+	--taskid=1 \
+	--verbose=1 \
+	--startk=4 \
+	--endk=8 \
+	--inputpath=A3/test3/test-input-3.gra \
+	--headerpath=A3/test3/test-header-3.dat \
+	--outputpath=A3/test3/task1-output-3.txt \
+
+ARGS314 = \
+	--taskid=1 \
+	--verbose=1 \
+	--startk=2 \
+	--endk=3 \
+	--inputpath=A3/test4/test-input-4.gra \
+	--headerpath=A3/test4/test-header-4.dat \
+	--outputpath=A3/test4/task1-output-4.txt \
+
+# A3: TASK 2 Test Cases
+
+ARGS321 = \
+	--taskid=2 \
+	--verbose=1 \
+	--endk=3 \
+	--inputpath=A3/test1/test-input-1.gra \
+	--headerpath=A3/test1/test-header-1.dat \
+	--outputpath=A3/test1/task2-output-1.txt \
+	--p=10 \
+
+ARGS322 = \
+	--taskid=2 \
+	--verbose=1 \
+	--startk=1 \
+	--endk=3 \
+	--inputpath=A3/test2/test-input-2.gra \
+	--headerpath=A3/test2/test-header-2.dat \
+	--outputpath=A3/test2/task2-output-2.txt \
+	--p=10 \
+
+ARGS323 = \
+	--taskid=2 \
+	--verbose=1 \
+	--startk=1 \
+	--endk=3 \
+	--inputpath=A3/test3/test-input-3.gra \
+	--headerpath=A3/test3/test-header-3.dat \
+	--outputpath=A3/test3/task2-output-3.txt \
+	--p=4 \
+
+ARGS324 = \
+	--taskid=2 \
+	--verbose=1 \
+	--startk=1 \
+	--endk=2 \
+	--inputpath=A3/test4/test-input-4.gra \
+	--headerpath=A3/test4/test-header-4.dat \
+	--outputpath=A3/test4/task2-output-4.txt \
+	--p=20 \
+
 #####################################################
 
 mpi_exec: mpi_main.o
@@ -160,7 +239,27 @@ mpi_run9: mpi_exec
 mpi_run10: mpi_exec
 	$(MPIRUN) a3 $(ARGS10)
 
-mpi_run: mpi_run-2 mpi_run-1 mpi_run0 mpi_run1 mpi_run2 mpi_run3 mpi_run4 mpi_run5 mpi_run6 mpi_run7 mpi_run8 mpi_run9 mpi_run10
+mpi_run311: mpi_exec
+	$(MPIRUN) a3 $(ARGS311)
+mpi_run312: mpi_exec
+	$(MPIRUN) a3 $(ARGS312)
+mpi_run313: mpi_exec
+	$(MPIRUN) a3 $(ARGS313)
+mpi_run314: mpi_exec
+	$(MPIRUN) a3 $(ARGS314)
+
+mpi_run321: mpi_exec
+	$(MPIRUN) a3 $(ARGS321)
+mpi_run322: mpi_exec
+	$(MPIRUN) a3 $(ARGS322)
+mpi_run323: mpi_exec
+	$(MPIRUN) a3 $(ARGS323)
+mpi_run324: mpi_exec
+	$(MPIRUN) a3 $(ARGS324)
+
+
+# mpi_run_old: mpi_run-2 mpi_run-1 mpi_run0 mpi_run1 mpi_run2 mpi_run3 mpi_run4 mpi_run5 mpi_run6 mpi_run7 mpi_run8 mpi_run9 mpi_run10
+mpi_run: mpi_run31 mpi_run32 mpi_run33 mpi_run34
 
 #####################################################
 
@@ -227,7 +326,27 @@ check9: verify.o
 check10: verify.o
 	./verify.o test10/test-output-10.txt test10/output10_verbose.txt
 
-check: check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10
+check311: verify.o
+	./verify.o A3/test1/task1-output-1.txt A3/test1/task1_output1_verbose.txt
+check312: verify.o
+	./verify.o A3/test2/task1-output-2.txt A3/test2/task1_output2_verbose.txt
+check313: verify.o
+	./verify.o A3/test3/task1-output-3.txt A3/test3/task1_output3_verbose.txt
+check314: verify.o
+	./verify.o A3/test4/task1-output-4.txt A3/test4/task1_output4_verbose.txt
+
+check321: verify.o
+	./verify.o A3/test1/task2-output-1.txt A3/test1/task2_output1_verbose.txt
+check322: verify.o
+	./verify.o A3/test2/task2-output-2.txt A3/test2/task2_output2_verbose.txt
+check323: verify.o
+	./verify.o A3/test3/task2-output-3.txt A3/test3/task2_output3_verbose.txt
+check324: verify.o
+	./verify.o A3/test4/task2-output-4.txt A3/test4/task2_output4_verbose.txt
+
+
+check_old: check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10
+check: check31 check32 check33 check34
 
 #####################################################
 
