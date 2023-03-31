@@ -354,8 +354,8 @@ int main(int argc, char *argv[])
     {
         deque < atomic<int>> queue_send;
         deque < atomic<int>> queue_recv;
-        atomic_int tag = 0;
-        atomic_int flag = 0;
+        atomic<int> tag = 0;
+        atomic<int> flag = 0;
 
         auto it = (*edges).begin();
         while (it != edges->end())
@@ -484,7 +484,7 @@ int main(int argc, char *argv[])
             }
 
         }
-
+        }
         /************ TEST FOR THE OUTPUT CORRECTNESS BEGINS ************/
 
         // printf("Edges size = %d\n", edges->size());
