@@ -400,6 +400,16 @@ int main(int argc, char *argv[])
                                 MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
                             }
                         }
+                    }else {
+                        Pair pii;
+                        pii.x = -1;
+                        pii.y = -1;
+
+                        for (int i=0; i<size; ++i) {
+                            if (i != rank) {
+                                MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                            }
+                        }
                     }
                 }
             
