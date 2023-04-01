@@ -61,9 +61,9 @@ int main(int argc, char *argv[])
 
     /***************** GET INPUT FROM FILE *****************/
 
-    // chrono::time_point<std::chrono::system_clock> start, end, start_final, end_final;
-    // start = std::chrono::system_clock::now();
-    // start_final = std::chrono::system_clock::now();
+    chrono::time_point<std::chrono::system_clock> start, end, start_final, end_final;
+    start = std::chrono::system_clock::now();
+    start_final = std::chrono::system_clock::now();
 
     FILE *ptr = fopen(inputpath.c_str(), "rb"); // r for read, b for binary
     FILE *header = fopen(headerpath.c_str(), "rb");
@@ -104,8 +104,23 @@ int main(int argc, char *argv[])
                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                 p += 4;
                 (*neighbors)[node].insert(nodej);
-                if (node < nodej)
-                    edges->insert({node, nodej});
+                if (node & 1)
+                {
+                    if ((nodej & 1) && (node > nodej))
+                        edges->insert({nodej, node});
+                }
+                else
+                {
+                    if (nodej & 1)
+                        if (node < nodej)
+                            edges->insert({node, nodej});
+                        else
+                            edges->insert({nodej, node});
+                    else if (node < nodej)
+                        edges->insert({node, nodej});
+                }
+                // if (node < nodej)
+                //     edges->insert({node, nodej});
             }
             std::free(buf);
         }
@@ -133,8 +148,23 @@ int main(int argc, char *argv[])
                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                 p += 4;
                 (*neighbors)[node].insert(nodej);
-                if (node < nodej)
-                    edges->insert({node, nodej});
+                if (node & 1)
+                {
+                    if ((nodej & 1) && (node > nodej))
+                        edges->insert({nodej, node});
+                }
+                else
+                {
+                    if (nodej & 1)
+                        if (node < nodej)
+                            edges->insert({node, nodej});
+                        else
+                            edges->insert({nodej, node});
+                    else if (node < nodej)
+                        edges->insert({node, nodej});
+                }
+                // if (node < nodej)
+                //     edges->insert({node, nodej});
             }
             std::free(buf);
         }
@@ -609,7 +639,7 @@ int main(int argc, char *argv[])
             int filesize = file.tellg();
 
             int MAXFILESIZE = 0.5 * (1000000000);
-            if (filesize > MAXFILESIZE)
+            if (filesize < MAXFILESIZE)
             {
                 // start = chrono::system_clock::now();
 
@@ -960,14 +990,14 @@ int main(int argc, char *argv[])
             }
         }
     }
-    // if (rank == 0)
-    // {
-    //     // fout.close();
+    if (rank == 0)
+    {
+        fout.close();
 
-    //     //end_final = chrono::system_clock::now();
-    //     //elapsed_ms = end_final - start_final;
-    //     //std::cout << "Time to end program: " << 1000 * elapsed_ms.count() << " milliseconds\n";
-    // }
+        end_final = chrono::system_clock::now();
+        chrono::duration<double> elapsed_ms = end_final - start_final;
+        std::cout << "Time to end program: " << 1000 * elapsed_ms.count() << " milliseconds\n";
+    }
 
     MPI_Finalize();
 }

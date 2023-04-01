@@ -1,0 +1,1719 @@
+mpiCC -std=c++11 -Wall -O3 -fopenmp -c main.cpp -o mpi_main.o
+mpiCC -std=c++11 -Wall -O3 -fopenmp mpi_main.o -o a3
+mpirun -np 4 a3 --taskid=1 --verbose=1 --startk=1 --endk=10 --inputpath=A2/test1/test-input-1.gra --headerpath=A2/test1/test-header-1.dat --outputpath=A2/test1/test-output-1.txt 
+tmp head 0
+head of 276 is 1
+head of 326 is 1
+head of 334 is 1
+head of 444 is 1
+head of 470 is 1
+head of 474 is 1
+head of 336 is 1
+head of 418 is 1
+head of 273 is 1
+head of 465 is 1
+head of 391 is 1
+head of 419 is 1
+head of 263 is 1
+head of 270 is 1
+head of 405 is 1
+head of 410 is 1
+head of 328 is 1
+head of 382 is 1
+head of 476 is 1
+head of 372 is 1
+head of 377 is 1
+head of 438 is 1
+head of 440 is 1
+head of 360 is 1
+head of 375 is 1
+head of 468 is 1
+head of 493 is 1
+head of 314 is 1
+head of 384 is 1
+head of 422 is 1
+head of 478 is 1
+head of 255 is 1
+head of 289 is 1
+head of 383 is 1
+head of 473 is 1
+head of 297 is 1
+head of 309 is 1
+head of 325 is 1
+head of 393 is 1
+head of 395 is 1
+head of 398 is 1
+head of 362 is 1
+head of 455 is 1
+head of 460 is 1
+head of 462 is 1
+head of 467 is 1
+head of 312 is 1
+head of 305 is 1
+head of 356 is 1
+head of 408 is 1
+head of 412 is 1
+head of 475 is 1
+head of 259 is 1
+head of 283 is 1
+head of 363 is 1
+head of 394 is 1
+head of 279 is 1
+head of 307 is 1
+head of 345 is 1
+head of 264 is 1
+head of 278 is 1
+head of 355 is 1
+head of 346 is 1
+head of 350 is 1
+head of 299 is 1
+head of 380 is 1
+head of 282 is 1
+head of 315 is 1
+head of 358 is 1
+head of 401 is 1
+head of 415 is 1
+head of 443 is 1
+head of 447 is 1
+head of 271 is 1
+head of 496 is 1
+head of 389 is 1
+head of 471 is 1
+head of 479 is 1
+head of 381 is 1
+head of 250 is 1
+head of 262 is 1
+head of 272 is 1
+head of 340 is 1
+head of 342 is 1
+head of 369 is 1
+head of 497 is 1
+head of 281 is 1
+head of 303 is 1
+head of 397 is 1
+head of 433 is 1
+head of 275 is 1
+head of 420 is 1
+head of 379 is 1
+head of 453 is 1
+head of 450 is 1
+head of 306 is 1
+head of 308 is 1
+head of 258 is 1
+head of 361 is 1
+head of 387 is 1
+head of 427 is 1
+head of 472 is 1
+head of 337 is 1
+head of 338 is 1
+head of 434 is 1
+head of 295 is 1
+head of 323 is 1
+head of 292 is 1
+head of 304 is 1
+head of 481 is 1
+head of 448 is 1
+head of 268 is 1
+head of 331 is 1
+head of 411 is 1
+head of 435 is 1
+head of 483 is 1
+head of 339 is 1
+head of 386 is 1
+head of 457 is 1
+head of 311 is 1
+head of 313 is 1
+head of 431 is 1
+head of 296 is 1
+head of 404 is 1
+head of 495 is 1
+head of 454 is 1
+head of 466 is 1
+head of 284 is 1
+head of 288 is 1
+head of 321 is 1
+head of 385 is 1
+head of 333 is 1
+head of 544 is 1
+head of 679 is 1
+head of 705 is 1
+head of 524 is 1
+head of 600 is 1
+head of 620 is 1
+head of 748 is 1
+head of 621 is 1
+head of 625 is 1
+head of 629 is 1
+head of 678 is 1
+head of 683 is 1
+head of 594 is 1
+head of 538 is 1
+head of 643 is 1
+head of 575 is 1
+head of 605 is 1
+head of 618 is 1
+head of 633 is 1
+head of 654 is 1
+head of 511 is 1
+head of 520 is 1
+head of 525 is 1
+head of 747 is 1
+head of 528 is 1
+head of 613 is 1
+head of 533 is 1
+head of 534 is 1
+head of 549 is 1
+head of 501 is 1
+head of 550 is 1
+head of 574 is 1
+head of 653 is 1
+head of 526 is 1
+head of 559 is 1
+head of 578 is 1
+head of 584 is 1
+head of 589 is 1
+head of 591 is 1
+head of 595 is 1
+head of 709 is 1
+head of 738 is 1
+head of 583 is 1
+head of 652 is 1
+head of 680 is 1
+head of 540 is 1
+head of 561 is 1
+head of 604 is 1
+head of 616 is 1
+head of 677 is 1
+head of 504 is 1
+head of 532 is 1
+head of 640 is 1
+head of 702 is 1
+head of 722 is 1
+head of 690 is 1
+head of 656 is 1
+head of 638 is 1
+head of 660 is 1
+head of 681 is 1
+head of 731 is 1
+head of 739 is 1
+head of 745 is 1
+head of 646 is 1
+head of 522 is 1
+head of 567 is 1
+head of 608 is 1
+head of 632 is 1
+head of 658 is 1
+head of 543 is 1
+head of 564 is 1
+head of 571 is 1
+head of 694 is 1
+head of 588 is 1
+head of 639 is 1
+head of 651 is 1
+head of 684 is 1
+head of 703 is 1
+head of 657 is 1
+head of 669 is 1
+head of 700 is 1
+head of 506 is 1
+head of 727 is 1
+head of 508 is 1
+head of 557 is 1
+head of 596 is 1
+head of 649 is 1
+head of 664 is 1
+head of 686 is 1
+head of 742 is 1
+head of 536 is 1
+head of 565 is 1
+head of 617 is 1
+head of 670 is 1
+head of 556 is 1
+head of 560 is 1
+head of 663 is 1
+head of 546 is 1
+head of 601 is 1
+head of 655 is 1
+head of 635 is 1
+head of 723 is 1
+head of 505 is 1
+head of 518 is 1
+head of 676 is 1
+head of 708 is 1
+head of 662 is 1
+head of 692 is 1
+head of 749 is 1
+head of 666 is 1
+head of 697 is 1
+head of 623 is 1
+head of 599 is 1
+head of 724 is 1
+head of 509 is 1
+head of 665 is 1
+head of 672 is 1
+head of 673 is 1
+head of 547 is 1
+head of 730 is 1
+head of 558 is 1
+head of 587 is 1
+head of 566 is 1
+head of 852 is 1
+head of 877 is 1
+head of 945 is 1
+head of 797 is 1
+head of 816 is 1
+head of 823 is 1
+head of 836 is 1
+head of 977 is 1
+head of 767 is 1
+head of 819 is 1
+head of 844 is 1
+head of 870 is 1
+head of 889 is 1
+head of 989 is 1
+head of 763 is 1
+head of 801 is 1
+head of 812 is 1
+head of 830 is 1
+head of 958 is 1
+head of 982 is 1
+head of 985 is 1
+head of 915 is 1
+head of 757 is 1
+head of 881 is 1
+head of 772 is 1
+head of 815 is 1
+head of 900 is 1
+head of 840 is 1
+head of 857 is 1
+head of 787 is 1
+head of 869 is 1
+head of 886 is 1
+head of 930 is 1
+head of 934 is 1
+head of 947 is 1
+head of 948 is 1
+head of 802 is 1
+head of 960 is 1
+head of 994 is 1
+head of 799 is 1
+head of 847 is 1
+head of 876 is 1
+head of 786 is 1
+head of 863 is 1
+head of 944 is 1
+head of 769 is 1
+head of 790 is 1
+head of 951 is 1
+head of 761 is 1
+head of 813 is 1
+head of 824 is 1
+head of 854 is 1
+head of 963 is 1
+head of 828 is 1
+head of 999 is 1
+head of 820 is 1
+head of 821 is 1
+head of 998 is 1
+head of 751 is 1
+head of 781 is 1
+head of 861 is 1
+head of 866 is 1
+head of 988 is 1
+head of 899 is 1
+head of 762 is 1
+head of 765 is 1
+head of 796 is 1
+head of 867 is 1
+head of 992 is 1
+head of 940 is 1
+head of 893 is 1
+head of 996 is 1
+head of 858 is 1
+head of 919 is 1
+head of 949 is 1
+head of 970 is 1
+head of 792 is 1
+head of 941 is 1
+head of 859 is 1
+head of 968 is 1
+head of 827 is 1
+head of 922 is 1
+head of 788 is 1
+head of 855 is 1
+head of 952 is 1
+head of 776 is 1
+head of 826 is 1
+head of 928 is 1
+head of 932 is 1
+head of 993 is 1
+head of 808 is 1
+head of 976 is 1
+head of 933 is 1
+head of 777 is 1
+head of 917 is 1
+head of 997 is 1
+head of 817 is 1
+head of 839 is 1
+head of 624 is 1
+head of 701 is 1
+head of 691 is 1
+head of 537 is 1
+head of 598 is 1
+head of 631 is 1
+head of 634 is 1
+head of 732 is 1
+head of 667 is 1
+head of 622 is 1
+head of 645 is 1
+head of 682 is 1
+head of 685 is 1
+head of 650 is 1
+head of 675 is 1
+head of 542 is 1
+head of 619 is 1
+head of 590 is 1
+head of 674 is 1
+head of 741 is 1
+head of 627 is 1
+head of 713 is 1
+head of 689 is 1
+head of 576 is 1
+head of 735 is 1
+head of 535 is 1
+head of 510 is 1
+head of 517 is 1
+head of 746 is 1
+head of 606 is 1
+head of 603 is 1
+head of 607 is 1
+head of 529 is 1
+head of 693 is 1
+head of 699 is 1
+head of 597 is 1
+head of 642 is 1
+head of 729 is 1
+head of 573 is 1
+head of 630 is 1
+head of 711 is 1
+head of 725 is 1
+head of 661 is 1
+head of 706 is 1
+head of 570 is 1
+head of 582 is 1
+head of 671 is 1
+head of 698 is 1
+head of 586 is 1
+head of 733 is 1
+head of 659 is 1
+head of 577 is 1
+head of 553 is 1
+head of 593 is 1
+head of 530 is 1
+head of 602 is 1
+head of 720 is 1
+head of 527 is 1
+head of 568 is 1
+head of 715 is 1
+head of 717 is 1
+head of 737 is 1
+head of 641 is 1
+head of 644 is 1
+head of 688 is 1
+head of 721 is 1
+head of 612 is 1
+head of 704 is 1
+head of 712 is 1
+head of 551 is 1
+head of 743 is 1
+head of 611 is 1
+head of 626 is 1
+head of 736 is 1
+head of 539 is 1
+head of 710 is 1
+head of 516 is 1
+head of 552 is 1
+head of 513 is 1
+head of 503 is 1
+head of 744 is 1
+head of 716 is 1
+head of 514 is 1
+head of 563 is 1
+head of 687 is 1
+head of 569 is 1
+head of 696 is 1
+head of 507 is 1
+head of 555 is 1
+head of 614 is 1
+head of 647 is 1
+head of 609 is 1
+head of 719 is 1
+head of 541 is 1
+head of 500 is 1
+head of 668 is 1
+head of 718 is 1
+head of 707 is 1
+head of 562 is 1
+head of 548 is 1
+head of 512 is 1
+head of 580 is 1
+head of 515 is 1
+head of 572 is 1
+head of 523 is 1
+head of 581 is 1
+head of 585 is 1
+head of 648 is 1
+head of 883 is 1
+head of 793 is 1
+head of 834 is 1
+head of 931 is 1
+head of 962 is 1
+head of 752 is 1
+head of 890 is 1
+head of 846 is 1
+head of 782 is 1
+head of 841 is 1
+head of 882 is 1
+head of 760 is 1
+head of 835 is 1
+head of 978 is 1
+head of 983 is 1
+head of 845 is 1
+head of 880 is 1
+head of 780 is 1
+head of 800 is 1
+head of 894 is 1
+head of 935 is 1
+head of 981 is 1
+head of 967 is 1
+head of 943 is 1
+head of 795 is 1
+head of 966 is 1
+head of 961 is 1
+head of 872 is 1
+head of 957 is 1
+head of 980 is 1
+head of 755 is 1
+head of 829 is 1
+head of 871 is 1
+head of 956 is 1
+head of 843 is 1
+head of 902 is 1
+head of 804 is 1
+head of 764 is 1
+head of 825 is 1
+head of 904 is 1
+head of 916 is 1
+head of 901 is 1
+head of 775 is 1
+head of 853 is 1
+head of 937 is 1
+head of 974 is 1
+head of 814 is 1
+head of 811 is 1
+head of 908 is 1
+head of 784 is 1
+head of 898 is 1
+head of 953 is 1
+head of 878 is 1
+head of 929 is 1
+head of 809 is 1
+head of 865 is 1
+head of 921 is 1
+head of 995 is 1
+head of 927 is 1
+head of 955 is 1
+head of 864 is 1
+head of 838 is 1
+head of 914 is 1
+head of 942 is 1
+head of 759 is 1
+head of 895 is 1
+head of 754 is 1
+head of 779 is 1
+head of 810 is 1
+head of 897 is 1
+head of 831 is 1
+head of 756 is 1
+head of 837 is 1
+head of 926 is 1
+head of 990 is 1
+head of 778 is 1
+head of 911 is 1
+head of 770 is 1
+head of 803 is 1
+head of 807 is 1
+head of 874 is 1
+head of 451 is 1
+head of 286 is 1
+head of 413 is 1
+head of 488 is 1
+head of 293 is 1
+head of 378 is 1
+head of 407 is 1
+head of 257 is 1
+head of 294 is 1
+head of 344 is 1
+head of 352 is 1
+head of 452 is 1
+head of 359 is 1
+head of 424 is 1
+head of 446 is 1
+head of 459 is 1
+head of 414 is 1
+head of 274 is 1
+head of 261 is 1
+head of 267 is 1
+head of 318 is 1
+head of 301 is 1
+head of 436 is 1
+head of 494 is 1
+head of 367 is 1
+head of 373 is 1
+head of 277 is 1
+head of 396 is 1
+head of 348 is 1
+head of 287 is 1
+head of 399 is 1
+head of 302 is 1
+head of 432 is 1
+head of 439 is 1
+head of 251 is 1
+head of 280 is 1
+head of 498 is 1
+head of 469 is 1
+head of 341 is 1
+head of 374 is 1
+head of 485 is 1
+head of 376 is 1
+head of 426 is 1
+head of 254 is 1
+head of 354 is 1
+head of 490 is 1
+head of 370 is 1
+head of 300 is 1
+head of 489 is 1
+head of 316 is 1
+head of 252 is 1
+head of 371 is 1
+head of 366 is 1
+head of 322 is 1
+head of 442 is 1
+head of 492 is 1
+head of 441 is 1
+head of 390 is 1
+head of 327 is 1
+head of 330 is 1
+head of 400 is 1
+head of 477 is 1
+head of 320 is 1
+head of 335 is 1
+head of 425 is 1
+head of 290 is 1
+head of 324 is 1
+head of 388 is 1
+head of 392 is 1
+head of 269 is 1
+head of 406 is 1
+head of 260 is 1
+head of 368 is 1
+head of 266 is 1
+head of 456 is 1
+head of 403 is 1
+head of 285 is 1
+head of 458 is 1
+head of 499 is 1
+head of 317 is 1
+head of 445 is 1
+head of 464 is 1
+head of 332 is 1
+head of 416 is 1
+head of 437 is 1
+head of 329 is 1
+head of 402 is 1
+head of 265 is 1
+head of 429 is 1
+head of 480 is 1
+head of 357 is 1
+head of 482 is 1
+head of 484 is 1
+head of 421 is 1
+head of 353 is 1
+head of 461 is 1
+head of 423 is 1
+head of 430 is 1
+head of 310 is 1
+head of 365 is 1
+head of 298 is 1
+head of 364 is 1
+head of 906 is 1
+head of 766 is 1
+head of 785 is 1
+head of 907 is 1
+head of 910 is 1
+head of 791 is 1
+head of 918 is 1
+head of 798 is 1
+head of 913 is 1
+head of 833 is 1
+head of 936 is 1
+head of 920 is 1
+head of 868 is 1
+head of 885 is 1
+head of 909 is 1
+head of 959 is 1
+head of 768 is 1
+head of 773 is 1
+head of 972 is 1
+head of 975 is 1
+head of 991 is 1
+head of 818 is 1
+head of 850 is 1
+head of 856 is 1
+head of 805 is 1
+head of 771 is 1
+head of 875 is 1
+head of 862 is 1
+head of 924 is 1
+head of 822 is 1
+head of 502 is 1
+head of 636 is 1
+head of 610 is 1
+head of 579 is 1
+head of 545 is 1
+head of 637 is 1
+head of 521 is 1
+head of 734 is 1
+head of 728 is 1
+head of 628 is 1
+head of 615 is 1
+head of 726 is 1
+head of 695 is 1
+head of 531 is 1
+head of 592 is 1
+head of 540 is 1
+head of 561 is 1
+head of 600 is 1
+head of 604 is 1
+head of 616 is 1
+head of 677 is 1
+head of 642 is 1
+head of 658 is 1
+head of 347 is 1
+head of 343 is 1
+head of 319 is 1
+head of 256 is 1
+head of 291 is 1
+head of 487 is 1
+head of 449 is 1
+head of 428 is 1
+head of 351 is 1
+head of 491 is 1
+head of 417 is 1
+head of 349 is 1
+head of 486 is 1
+head of 253 is 1
+head of 409 is 1
+head of 463 is 1
+head of 582 is 1
+head of 587 is 1
+head of 588 is 1
+head of 612 is 1
+head of 662 is 1
+head of 693 is 1
+head of 704 is 1
+head of 712 is 1
+head of 551 is 1
+head of 625 is 1
+head of 640 is 1
+head of 671 is 1
+head of 698 is 1
+head of 730 is 1
+head of 743 is 1
+head of 522 is 1
+head of 571 is 1
+head of 891 is 1
+head of 946 is 1
+head of 750 is 1
+head of 896 is 1
+head of 887 is 1
+head of 794 is 1
+head of 938 is 1
+head of 879 is 1
+head of 903 is 1
+head of 971 is 1
+head of 873 is 1
+head of 979 is 1
+head of 842 is 1
+head of 860 is 1
+head of 986 is 1
+head of 758 is 1
+head of 643 is 1
+head of 689 is 1
+head of 694 is 1
+head of 848 is 1
+head of 849 is 1
+head of 748 is 1
+head of 521 is 1
+head of 729 is 1
+head of 573 is 1
+head of 965 is 1
+head of 832 is 1
+head of 925 is 1
+head of 912 is 1
+head of 722 is 1
+head of 564 is 1
+head of 586 is 1
+head of 591 is 1
+head of 635 is 1
+head of 638 is 1
+head of 654 is 1
+head of 660 is 1
+head of 681 is 1
+head of 731 is 1
+head of 739 is 1
+head of 745 is 1
+head of 611 is 1
+head of 626 is 1
+head of 649 is 1
+head of 939 is 1
+head of 783 is 1
+head of 753 is 1
+head of 851 is 1
+head of 789 is 1
+head of 984 is 1
+head of 892 is 1
+head of 884 is 1
+head of 987 is 1
+head of 973 is 1
+head of 923 is 1
+head of 950 is 1
+head of 888 is 1
+head of 954 is 1
+head of 692 is 1
+head of 736 is 1
+head of 741 is 1
+head of 539 is 1
+head of 703 is 1
+head of 713 is 1
+head of 511 is 1
+head of 574 is 1
+head of 620 is 1
+head of 711 is 1
+head of 514 is 1
+head of 595 is 1
+head of 614 is 1
+head of 685 is 1
+head of 520 is 1
+head of 964 is 1
+head of 969 is 1
+head of 774 is 1
+head of 905 is 1
+head of 806 is 1
+head of 960 is 1
+head of 994 is 1
+head of 929 is 1
+head of 936 is 1
+head of 998 is 1
+head of 761 is 1
+head of 529 is 1
+head of 716 is 1
+head of 657 is 1
+head of 733 is 1
+head of 603 is 1
+head of 667 is 1
+head of 746 is 1
+head of 548 is 1
+head of 576 is 1
+head of 537 is 1
+head of 777 is 1
+head of 826 is 1
+head of 833 is 1
+head of 839 is 1
+head of 847 is 1
+head of 963 is 1
+head of 980 is 1
+head of 787 is 1
+head of 858 is 1
+head of 870 is 1
+head of 709 is 1
+head of 922 is 1
+head of 985 is 1
+head of 769 is 1
+head of 824 is 1
+head of 825 is 1
+head of 865 is 1
+head of 920 is 1
+head of 953 is 1
+head of 819 is 1
+head of 828 is 1
+head of 904 is 1
+head of 916 is 1
+head of 755 is 1
+head of 835 is 1
+head of 645 is 1
+head of 648 is 1
+head of 718 is 1
+head of 506 is 1
+head of 507 is 1
+head of 570 is 1
+head of 684 is 1
+head of 546 is 1
+head of 580 is 1
+head of 513 is 1
+head of 526 is 1
+head of 559 is 1
+head of 624 is 1
+head of 619 is 1
+head of 652 is 1
+head of 932 is 1
+head of 796 is 1
+head of 863 is 1
+head of 868 is 1
+head of 885 is 1
+head of 538 is 1
+head of 723 is 1
+head of 670 is 1
+head of 909 is 1
+head of 959 is 1
+head of 983 is 1
+head of 565 is 1
+head of 683 is 1
+head of 747 is 1
+head of 536 is 1
+head of 525 is 1
+head of 556 is 1
+head of 623 is 1
+head of 672 is 1
+head of 598 is 1
+head of 605 is 1
+head of 724 is 1
+head of 532 is 1
+head of 555 is 1
+head of 560 is 1
+head of 629 is 1
+head of 721 is 1
+head of 504 is 1
+head of 700 is 1
+head of 751 is 1
+head of 765 is 1
+head of 768 is 1
+head of 798 is 1
+head of 799 is 1
+head of 786 is 1
+head of 951 is 1
+head of 773 is 1
+head of 867 is 1
+head of 931 is 1
+head of 972 is 1
+head of 802 is 1
+head of 841 is 1
+head of 881 is 1
+head of 957 is 1
+head of 975 is 1
+head of 827 is 1
+head of 991 is 1
+head of 871 is 1
+head of 900 is 1
+head of 906 is 1
+head of 952 is 1
+head of 708 is 1
+head of 510 is 1
+head of 728 is 1
+head of 682 is 1
+head of 695 is 1
+head of 749 is 1
+head of 962 is 1
+head of 778 is 1
+head of 810 is 1
+head of 557 is 1
+head of 558 is 1
+head of 627 is 1
+head of 549 is 1
+head of 646 is 1
+head of 516 is 1
+head of 607 is 1
+head of 706 is 1
+head of 501 is 1
+head of 524 is 1
+head of 725 is 1
+head of 528 is 1
+head of 613 is 1
+head of 500 is 1
+head of 707 is 1
+head of 566 is 1
+head of 621 is 1
+head of 505 is 1
+head of 518 is 1
+head of 608 is 1
+head of 676 is 1
+head of 567 is 1
+head of 632 is 1
+head of 702 is 1
+head of 509 is 1
+head of 563 is 1
+head of 663 is 1
+head of 720 is 1
+head of 655 is 1
+head of 678 is 1
+head of 680 is 1
+head of 530 is 1
+head of 836 is 1
+head of 776 is 1
+head of 892 is 1
+head of 981 is 1
+head of 797 is 1
+head of 820 is 1
+head of 901 is 1
+head of 912 is 1
+head of 866 is 1
+head of 921 is 1
+head of 937 is 1
+head of 989 is 1
+head of 762 is 1
+head of 771 is 1
+head of 837 is 1
+head of 846 is 1
+head of 872 is 1
+head of 943 is 1
+head of 995 is 1
+head of 750 is 1
+head of 816 is 1
+head of 775 is 1
+head of 788 is 1
+head of 791 is 1
+head of 812 is 1
+head of 923 is 1
+head of 811 is 1
+head of 831 is 1
+head of 908 is 1
+head of 925 is 1
+head of 969 is 1
+head of 545 is 1
+head of 732 is 1
+head of 541 is 1
+head of 669 is 1
+head of 553 is 1
+head of 855 is 1
+head of 763 is 1
+head of 717 is 1
+head of 737 is 1
+head of 618 is 1
+head of 630 is 1
+head of 631 is 1
+head of 727 is 1
+head of 578 is 1
+head of 593 is 1
+head of 596 is 1
+head of 634 is 1
+head of 651 is 1
+head of 857 is 1
+head of 947 is 1
+head of 954 is 1
+head of 990 is 1
+head of 854 is 1
+head of 873 is 1
+head of 930 is 1
+head of 785 is 1
+head of 752 is 1
+head of 830 is 1
+head of 842 is 1
+head of 852 is 1
+head of 656 is 1
+head of 696 is 1
+head of 590 is 1
+head of 534 is 1
+head of 515 is 1
+head of 602 is 1
+head of 636 is 1
+head of 895 is 1
+head of 955 is 1
+head of 996 is 1
+head of 889 is 1
+head of 992 is 1
+head of 801 is 1
+head of 882 is 1
+head of 764 is 1
+head of 609 is 1
+head of 719 is 1
+head of 533 is 1
+head of 668 is 1
+head of 673 is 1
+head of 650 is 1
+head of 583 is 1
+head of 639 is 1
+head of 622 is 1
+head of 610 is 1
+head of 543 is 1
+head of 647 is 1
+head of 726 is 1
+head of 715 is 1
+head of 542 is 1
+head of 738 is 1
+head of 577 is 1
+head of 690 is 1
+head of 617 is 1
+head of 734 is 1
+head of 568 is 1
+head of 550 is 1
+head of 597 is 1
+head of 679 is 1
+head of 633 is 1
+head of 674 is 1
+head of 606 is 1
+head of 601 is 1
+head of 742 is 1
+head of 653 is 1
+head of 523 is 1
+head of 589 is 1
+head of 659 is 1
+head of 705 is 1
+head of 547 is 1
+head of 572 is 1
+head of 641 is 1
+head of 584 is 1
+head of 665 is 1
+head of 594 is 1
+head of 699 is 1
+head of 701 is 1
+head of 644 is 1
+head of 688 is 1
+head of 531 is 1
+head of 795 is 1
+head of 821 is 1
+head of 843 is 1
+head of 784 is 1
+head of 844 is 1
+head of 874 is 1
+head of 950 is 1
+head of 924 is 1
+head of 997 is 1
+head of 780 is 1
+head of 965 is 1
+head of 986 is 1
+head of 973 is 1
+head of 813 is 1
+head of 849 is 1
+head of 933 is 1
+head of 999 is 1
+head of 793 is 1
+head of 987 is 1
+head of 941 is 1
+head of 756 is 1
+head of 790 is 1
+head of 772 is 1
+head of 919 is 1
+head of 803 is 1
+head of 829 is 1
+head of 864 is 1
+head of 897 is 1
+head of 956 is 1
+head of 834 is 1
+head of 792 is 1
+head of 927 is 1
+head of 978 is 1
+head of 859 is 1
+head of 976 is 1
+head of 848 is 1
+head of 988 is 1
+head of 939 is 1
+head of 845 is 1
+head of 876 is 1
+head of 946 is 1
+head of 758 is 1
+head of 697 is 1
+head of 686 is 1
+head of 562 is 1
+head of 661 is 1
+head of 666 is 1
+head of 552 is 1
+head of 569 is 1
+head of 664 is 1
+head of 592 is 1
+head of 735 is 1
+head of 581 is 1
+head of 579 is 1
+head of 675 is 1
+head of 535 is 1
+head of 628 is 1
+head of 527 is 1
+head of 508 is 1
+head of 637 is 1
+head of 710 is 1
+head of 517 is 1
+head of 687 is 1
+head of 502 is 1
+head of 544 is 1
+head of 599 is 1
+head of 744 is 1
+head of 585 is 1
+head of 575 is 1
+head of 503 is 1
+head of 691 is 1
+head of 615 is 1
+head of 512 is 1
+head of 808 is 1
+head of 814 is 1
+head of 910 is 1
+head of 945 is 1
+head of 789 is 1
+head of 766 is 1
+head of 832 is 1
+head of 806 is 1
+head of 851 is 1
+head of 888 is 1
+head of 958 is 1
+head of 774 is 1
+head of 869 is 1
+head of 938 is 1
+head of 979 is 1
+head of 760 is 1
+head of 840 is 1
+head of 877 is 1
+head of 804 is 1
+head of 944 is 1
+head of 754 is 1
+head of 781 is 1
+head of 880 is 1
+head of 822 is 1
+head of 893 is 1
+head of 818 is 1
+head of 860 is 1
+head of 757 is 1
+head of 807 is 1
+head of 815 is 1
+head of 838 is 1
+head of 914 is 1
+head of 913 is 1
+head of 934 is 1
+head of 783 is 1
+head of 949 is 1
+head of 899 is 1
+head of 898 is 1
+head of 926 is 1
+head of 770 is 1
+head of 903 is 1
+head of 982 is 1
+head of 942 is 1
+head of 948 is 1
+head of 782 is 1
+head of 878 is 1
+head of 753 is 1
+head of 809 is 1
+head of 823 is 1
+head of 883 is 1
+head of 890 is 1
+head of 970 is 1
+head of 805 is 1
+head of 853 is 1
+head of 875 is 1
+head of 894 is 1
+head of 966 is 1
+head of 915 is 1
+head of 940 is 1
+head of 862 is 1
+head of 984 is 1
+head of 961 is 1
+head of 896 is 1
+head of 861 is 1
+head of 817 is 1
+head of 968 is 1
+head of 891 is 1
+head of 977 is 1
+head of 850 is 1
+head of 902 is 1
+head of 918 is 1
+head of 800 is 1
+head of 887 is 1
+head of 911 is 1
+head of 974 is 1
+head of 779 is 1
+head of 856 is 1
+head of 767 is 1
+head of 928 is 1
+head of 964 is 1
+head of 886 is 1
+head of 917 is 1
+head of 794 is 1
+head of 993 is 1
+head of 935 is 1
+head of 967 is 1
+head of 879 is 1
+head of 971 is 1
+head of 907 is 1
+head of 884 is 1
+head of 905 is 1
+head of 759 is 1
+head of 960 is 1
+head of 994 is 1
+head of 796 is 1
+head of 847 is 1
+head of 863 is 1
+head of 868 is 1
+head of 885 is 1
+head of 909 is 1
+head of 959 is 1
+head of 983 is 1
+head of 761 is 1
+head of 777 is 1
+head of 826 is 1
+head of 833 is 1
+head of 839 is 1
+head of 963 is 1
+head of 980 is 1
+head of 787 is 1
+head of 858 is 1
+head of 870 is 1
+head of 922 is 1
+head of 985 is 1
+head of 929 is 1
+head of 936 is 1
+head of 998 is 1
+head of 769 is 1
+head of 824 is 1
+head of 825 is 1
+head of 865 is 1
+head of 920 is 1
+head of 953 is 1
+head of 819 is 1
+head of 828 is 1
+head of 904 is 1
+head of 916 is 1
+head of 755 is 1
+head of 835 is 1
+head of 932 is 1
+head of 751 is 1
+head of 765 is 1
+head of 768 is 1
+head of 798 is 1
+head of 799 is 1
+head of 786 is 1
+head of 951 is 1
+head of 773 is 1
+head of 867 is 1
+head of 931 is 1
+head of 972 is 1
+head of 886 is 1
+head of 802 is 1
+head of 841 is 1
+head of 881 is 1
+head of 957 is 1
+head of 975 is 1
+head of 827 is 1
+head of 991 is 1
+head of 792 is 1
+head of 843 is 1
+head of 945 is 1
+head of 789 is 1
+head of 771 is 1
+head of 813 is 1
+head of 846 is 1
+head of 832 is 1
+head of 859 is 1
+head of 976 is 1
+head of 762 is 1
+head of 775 is 1
+head of 845 is 1
+head of 943 is 1
+head of 947 is 1
+head of 956 is 1
+head of 996 is 1
+head of 837 is 1
+head of 897 is 1
+head of 806 is 1
+head of 851 is 1
+head of 888 is 1
+head of 810 is 1
+head of 900 is 1
+head of 866 is 1
+head of 921 is 1
+head of 937 is 1
+head of 989 is 1
+head of 995 is 1
+head of 750 is 1
+head of 757 is 1
+head of 814 is 1
+head of 854 is 1
+head of 816 is 1
+head of 962 is 1
+head of 788 is 1
+head of 791 is 1
+head of 812 is 1
+head of 923 is 1
+head of 811 is 1
+head of 831 is 1
+head of 908 is 1
+head of 925 is 1
+head of 969 is 1
+head of 855 is 1
+head of 776 is 1
+head of 763 is 1
+head of 857 is 1
+head of 954 is 1
+head of 990 is 1
+head of 873 is 1
+head of 930 is 1
+head of 785 is 1
+head of 830 is 1
+head of 842 is 1
+head of 852 is 1
+head of 895 is 1
+head of 952 is 1
+head of 955 is 1
+head of 889 is 1
+head of 992 is 1
+head of 801 is 1
+head of 871 is 1
+head of 778 is 1
+head of 836 is 1
+head of 892 is 1
+head of 906 is 1
+head of 981 is 1
+head of 797 is 1
+head of 820 is 1
+head of 901 is 1
+head of 912 is 1
+head of 784 is 1
+head of 844 is 1
+head of 874 is 1
+head of 950 is 1
+head of 924 is 1
+head of 997 is 1
+head of 780 is 1
+head of 965 is 1
+head of 986 is 1
+head of 973 is 1
+head of 793 is 1
+head of 899 is 1
+head of 917 is 1
+head of 849 is 1
+head of 933 is 1
+head of 999 is 1
+head of 944 is 1
+head of 987 is 1
+head of 941 is 1
+head of 919 is 1
+head of 803 is 1
+head of 829 is 1
+head of 864 is 1
+head of 834 is 1
+head of 915 is 1
+head of 872 is 1
+head of 927 is 1
+head of 978 is 1
+head of 848 is 1
+head of 988 is 1
+head of 946 is 1
+head of 752 is 1
+head of 758 is 1
+head of 764 is 1
+head of 808 is 1
+head of 910 is 1
+head of 774 is 1
+head of 869 is 1
+head of 938 is 1
+head of 979 is 1
+head of 760 is 1
+head of 840 is 1
+head of 877 is 1
+head of 804 is 1
+head of 754 is 1
+head of 781 is 1
+head of 880 is 1
+head of 795 is 1
+head of 822 is 1
+head of 893 is 1
+head of 818 is 1
+head of 860 is 1
+head of 838 is 1
+head of 815 is 1
+head of 914 is 1
+head of 766 is 1
+head of 876 is 1
+head of 913 is 1
+head of 807 is 1
+head of 934 is 1
+head of 949 is 1
+head of 898 is 1
+head of 926 is 1
+head of 770 is 1
+head of 903 is 1
+head of 772 is 1
+head of 890 is 1
+head of 779 is 1
+head of 794 is 1
+head of 966 is 1
+head of 984 is 1
+head of 982 is 1
+head of 942 is 1
+head of 958 is 1
+head of 948 is 1
+head of 782 is 1
+head of 753 is 1
+head of 809 is 1
+head of 823 is 1
+head of 805 is 1
+head of 961 is 1
+head of 875 is 1
+head of 821 is 1
+head of 967 is 1
+head of 968 is 1
+head of 767 is 1
+head of 790 is 1
+head of 928 is 1
+head of 756 is 1
+head of 800 is 1
+head of 993 is 1
+head of 783 is 1
+head of 894 is 1
+head of 935 is 1
+head of 911 is 1
+head of 878 is 1
+head of 896 is 1
+head of 974 is 1
+head of 856 is 1
+head of 883 is 1
+head of 861 is 1
+head of 891 is 1
+head of 964 is 1
+head of 887 is 1
+head of 853 is 1
+head of 939 is 1
+head of 902 is 1
+head of 970 is 1
+head of 850 is 1
+head of 882 is 1
+head of 862 is 1
+head of 817 is 1
+head of 918 is 1
+head of 940 is 1
+head of 977 is 1
+head of 879 is 1
+head of 905 is 1
+head of 884 is 1
+head of 971 is 1
+head of 907 is 1
+head of 759 is 1
+rank 0 got1  991
+rank 0 got2 991
+rank 0 got head 0 from rank 3 : 0
+head = 0
+rank 0 got1  996
+rank 0 got2 996
+rank 0 got head 0 from rank 1 : 0
+head = 0
+rank 0 got1  996
+rank 0 got2 996
+rank 0 got head 0 from rank 2 : 0
+head = 0
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+head of 282 is 5
+head of 341 is 155
+head of 595 is 595
+head of 649 is 595
+head of 683 is 595
+head of 732 is 87
+head of 746 is 101
+head of 568 is 299
+head of 569 is 299
+tmp head 5
+tmp head 104
+tmp head 182
+head of 995 is 87
+head of 988 is 101
+head of 897 is 155
+head of 798 is 255
+head of 862 is 723
+head of 875 is 723
+head of 831 is 545
+head of 949 is 545
+head of 987 is 545
+head of 995 is 87
+head of 988 is 101
+head of 897 is 155
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 87 from rank 3 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 5 from rank 1 : 5
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 87 from rank 2 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 101 from rank 3 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 87 from rank 1 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 101 from rank 2 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 104 from rank 3 : 104
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 101 from rank 1 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 299 from rank 2 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 255 from rank 3 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 104 from rank 1 : 104
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 182 from rank 2 : 182
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  7
+rank 0 got2 7
+rank 0 got head 446 from rank 3 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 255 from rank 1 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  8
+rank 0 got2 8
+rank 0 got head 316 from rank 3 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  5
+rank 0 got2 5
+rank 0 got head 299 from rank 1 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  8
+rank 0 got2 8
+rank 0 got head 316 from rank 1 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  7
+rank 0 got2 7
+rank 0 got head 446 from rank 1 : 0
+head = 0
+head = 5
+head = 104
+head = 182
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+rank 0 got1  -1
+num_fin = 1
+rank 0 got1  -1
+num_fin = 2
+rank 0 got1  -1
+num_fin = 3
+Time to end program: 37.4558 milliseconds

@@ -10,7 +10,27 @@ typedef unsigned int uint;
 typedef long long ll;
 
 #define deg(i) neighbors[i].size()
-#define get_node_rank(i) (i / (n / size))
+#define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
+
+int get_edge_rank(int i, int j, int n, int size)
+{
+    if (i & 1)
+    {
+        if ((j & 1) && (i > j))
+            return get_node_rank(i);
+        else
+            return get_node_rank(j);
+    }
+    else
+    {
+        if (j & 1)
+            return get_node_rank(i);
+        else if (i < j)
+            return get_node_rank(i);
+        else
+            return get_node_rank(j);
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -71,9 +91,9 @@ int main(int argc, char *argv[])
 
     /***************** GET INPUT FROM FILE *****************/
 
-    // chrono::time_point<std::chrono::system_clock> start, end, start_final, end_final;
-    // start = std::chrono::system_clock::now();
-    // start_final = std::chrono::system_clock::now();
+    chrono::time_point<std::chrono::system_clock> start, end, start_final, end_final;
+    start = std::chrono::system_clock::now();
+    start_final = std::chrono::system_clock::now();
 
     FILE *ptr = fopen(inputpath.c_str(), "rb"); // r for read, b for binary
     FILE *header = fopen(headerpath.c_str(), "rb");
@@ -118,8 +138,24 @@ int main(int argc, char *argv[])
                 p += 4;
                 (*neighbors)[node].insert(nodej);
                 (*filtered_neighbors)[node].insert(nodej);
-                if (node < nodej)
-                    edges->insert({node, nodej});
+                // Assign edges to even and smaller (if both even) and larger (if both odd) nodes only
+                if (node & 1)
+                {
+                    if ((nodej & 1) && (node > nodej))
+                        edges->insert({nodej, node});
+                }
+                else
+                {
+                    if (nodej & 1)
+                        if (node < nodej)
+                            edges->insert({node, nodej});
+                        else
+                            edges->insert({nodej, node});
+                    else if (node < nodej)
+                        edges->insert({node, nodej});
+                }
+                // if (node < nodej)
+                //     edges->insert({node, nodej});
             }
             std::free(buf);
         }
@@ -148,8 +184,23 @@ int main(int argc, char *argv[])
                 p += 4;
                 (*neighbors)[node].insert(nodej);
                 (*filtered_neighbors)[node].insert(nodej);
-                if (node < nodej)
-                    edges->insert({node, nodej});
+                if (node & 1)
+                {
+                    if ((nodej & 1) && (node > nodej))
+                        edges->insert({nodej, node});
+                }
+                else
+                {
+                    if (nodej & 1)
+                        if (node < nodej)
+                            edges->insert({node, nodej});
+                        else
+                            edges->insert({nodej, node});
+                    else if (node < nodej)
+                        edges->insert({node, nodej});
+                }
+                // if (node < nodej)
+                //     edges->insert({node, nodej});
             }
             std::free(buf);
         }
@@ -1022,7 +1073,12 @@ int main(int argc, char *argv[])
             }
             else
             {
-                set<set<int>> *connected_comps = new set<set<int>>();
+                map<int, int> *head = new map<int, int>();
+                vector<vector<int>> *extr_vert = new vector<vector<int>>(size);
+
+                // set<set<int>> *connected_comps = new set<set<int>>();
+
+                map<int, set<int>> *connected_comps = new map<int, set<int>>();
                 map<int, int> *visited = new map<int, int>();
                 queue<int> *trav = new queue<int>();
                 auto it = (*edges).begin();
@@ -1034,23 +1090,40 @@ int main(int argc, char *argv[])
                     if (it == (*edges).end())
                         break;
 
+                    int tmp_head = -1;
                     set<int> *grp_verts = new set<int>();
                     if ((*visited)[(*it).first] == 0)
                     {
                         (*trav).push((*it).first);
+                        tmp_head = (*it).first;
                         (*visited)[(*it).first] = 1;
                     }
                     if ((*visited)[(*it).second] == 0)
                     {
                         (*trav).push((*it).second);
+                        if (tmp_head == -1)
+                            tmp_head = (*it).second;
                         (*visited)[(*it).second] = 1;
                     }
+                    if(rank == 0)
+                        printf("tmp head %d\n", tmp_head);
+                    if (tmp_head == -1)
+                        continue;
                     while ((*trav).size() > 0)
                     {
                         int i = (*trav).front();
                         (*trav).pop();
                         grp_verts->insert(i);
                         (*visited)[i] = 1;
+
+                        int node_rank = get_node_rank(i);
+                        (*head)[i] = tmp_head;
+                        if (node_rank != rank)
+                        {
+                            (*extr_vert)[node_rank].push_back(i);
+                            (*extr_vert)[node_rank].push_back(tmp_head);
+                        }
+
                         for (int j : (*filtered_neighbors)[i])
                         {
                             if ((*visited)[j] == 0)
@@ -1060,7 +1133,48 @@ int main(int argc, char *argv[])
                             }
                         }
                     }
-                    connected_comps->insert(*grp_verts);
+                    connected_comps->insert({tmp_head, *grp_verts});
+                    // connected_comps->insert(*grp_verts);
+                }
+
+                // printf("Rank %d said HI\n", rank);
+
+                int num_stop = rank;
+                vector<int> *tmp_conn = new vector<int>(2 * n);
+                while (num_stop > 0)
+                {
+                    MPI_Status stat;
+                    MPI_Recv(tmp_conn->data(), 2 * n, MPI_INT, MPI_ANY_SOURCE, 5, MPI_COMM_WORLD, &stat);
+                    if ((*tmp_conn)[0] != -1)
+                    {
+                        int cnt = 0;
+                        MPI_Get_count(&stat, MPI_INT, &cnt);
+                        for (int i = 0; i < cnt; i += 2)
+                        {
+                            if (head->find((*tmp_conn)[i]) == head->end())
+                                continue;
+                            int hd = (*head)[(*tmp_conn)[i]];
+                            printf("head of %d is %d\n", (*tmp_conn)[i], hd);
+                            if (hd == (*tmp_conn)[i + 1])
+                                continue;
+                            (*head)[hd] = (*tmp_conn)[i + 1];
+                        }
+                    }
+                    num_stop--;
+                }
+                for (int rk = rank + 1; rk < size; rk++)
+                {
+                    if ((*extr_vert)[rk].size() == 0)
+                    {
+                        int stop = -1;
+                        MPI_Send(&stop, 1, MPI_INT, rk, 5, MPI_COMM_WORLD);
+                    }
+                    else
+                    {
+                        int sz = (*extr_vert)[rk].size();
+                        vector<int> datum = (*extr_vert)[rk];
+                        MPI_Send(datum.data(), sz, MPI_INT, rk, 5, MPI_COMM_WORLD);
+                    }
                 }
 
                 MPI_Barrier(MPI_COMM_WORLD);
@@ -1078,19 +1192,8 @@ int main(int argc, char *argv[])
 
                 if (rank == 0)
                 {
-
-                    map<int, int> mp_rep;
-                    map<int, set<int>> mp_comp;
-                    int rep = 0;
-                    for (auto comp : *connected_comps)
-                    {
-                        for (auto v : comp)
-                        {
-                            mp_rep[v] = rep;
-                        }
-                        mp_comp[rep] = comp;
-                        rep++;
-                    }
+                    // map<int, int> mp_rep;
+                    // map<int, set<int>> mp_comp;
 
                     // printf("rank 0 is here\n");
 
@@ -1106,72 +1209,86 @@ int main(int argc, char *argv[])
 
                         MPI_Recv(&len, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &stat);
 
-                        // printf("rank 0 got1  %d\n",len);
+                        printf("rank 0 got1  %d\n", len);
 
                         if (len == -1)
                         {
                             num_fin++;
-                            // printf("num_fin = %d\n",num_fin);
+                            printf("num_fin = %d\n", num_fin);
                             continue;
                         }
                         int vec[len];
                         MPI_Recv(vec, len, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &stat);
 
-                        // printf("rank 0 got2 %d\n",len);
+                        printf("rank 0 got2 %d\n", len);
 
                         int flag = 0;
 
-                        set<set<int>> comps_to_be_del;
-                        set<int> comp_fin;
-                        set<int> visited;
-                        for (int in = 0; in < len; ++in)
-                        {
-                            int v = vec[in];
-                            if (mp_rep.find(v) != mp_rep.end())
-                            {
-                                flag++;
-                                auto comp = mp_comp[mp_rep[v]];
+                        int hd = vec[0];
+                        printf("rank 0 got head %d from rank %d : %d\n", hd, stat.MPI_SOURCE, (*head)[hd]);
 
-                                if (visited.find(mp_rep[v]) == visited.end())
-                                {
-                                    comps_to_be_del.insert(comp);
-                                    comp_fin.insert(comp.begin(), comp.end());
-                                    visited.insert(mp_rep[v]);
-                                }
-                            }
-                        }
-                        // printf("%d\n", flag);
-                        if (flag != 0)
-                        {
-                            for (int in = 0; in < len; ++in)
-                            {
-                                comp_fin.insert(vec[in]);
-                            }
-                            for (auto comp : comps_to_be_del)
-                            {
-                                connected_comps->erase(comp);
-                            }
-                            connected_comps->insert(comp_fin);
-                            for (auto v : comp_fin)
-                            {
-                                mp_rep[v] = rep;
-                            }
-                            mp_comp[rep] = comp_fin;
-                            rep++;
-                        }
-                        else
-                        {
-                            set<int> recv_conn_comp;
-                            for (int in = 0; in < len; ++in)
-                            {
-                                int v = vec[in];
-                                mp_rep[v] = rep;
-                                recv_conn_comp.insert(v);
-                            }
-                            mp_comp[rep] = recv_conn_comp;
-                            rep++;
-                            connected_comps->insert(recv_conn_comp);
-                        }
+                        while ((*head)[hd] != hd)
+                            hd = (*head)[hd];
+                        (*head)[vec[0]] = hd;
+                        (*head)[vec[1]] = hd;
+
+                        for (int ind = 1; ind < len; ind++)
+                            (*connected_comps)[hd].insert(vec[ind]);
+
+                        for (auto x : (*connected_comps))
+                            printf("head = %d\n", x.first);
+
+                        // set<set<int>> comps_to_be_del;
+                        // set<int> comp_fin;
+                        // set<int> visited;
+                        // for (int in = 0; in < len; ++in)
+                        // {
+                        //     int v = vec[in];
+                        //     if (mp_rep.find(v) != mp_rep.end())
+                        //     {
+                        //         flag++;
+                        //         auto comp = mp_comp[mp_rep[v]];
+
+                        //         if (visited.find(mp_rep[v]) == visited.end())
+                        //         {
+                        //             comps_to_be_del.insert(comp);
+                        //             comp_fin.insert(comp.begin(), comp.end());
+                        //             visited.insert(mp_rep[v]);
+                        //         }
+                        //     }
+                        // }
+                        // // printf("%d\n", flag);
+                        // if (flag != 0)
+                        // {
+                        //     for (int in = 0; in < len; ++in)
+                        //     {
+                        //         comp_fin.insert(vec[in]);
+                        //     }
+                        //     for (auto comp : comps_to_be_del)
+                        //     {
+                        //         connected_comps->erase(comp);
+                        //     }
+                        //     connected_comps->insert(comp_fin);
+                        //     for (auto v : comp_fin)
+                        //     {
+                        //         mp_rep[v] = rep;
+                        //     }
+                        //     mp_comp[rep] = comp_fin;
+                        //     rep++;
+                        // }
+                        // else
+                        // {
+                        //     set<int> recv_conn_comp;
+                        //     for (int in = 0; in < len; ++in)
+                        //     {
+                        //         int v = vec[in];
+                        //         mp_rep[v] = rep;
+                        //         recv_conn_comp.insert(v);
+                        //     }
+                        //     mp_comp[rep] = recv_conn_comp;
+                        //     rep++;
+                        //     connected_comps->insert(recv_conn_comp);
+                        // }
                         // printf("%d\n", connected_comps->size());
                     }
                     // printf("%d\n", connected_comps->size());
@@ -1186,10 +1303,10 @@ int main(int argc, char *argv[])
                             for (auto grp : (*connected_comps))
                             {
                                 int i = 0;
-                                for (int v : grp)
+                                for (int v : grp.second)
                                 {
                                     fout << v;
-                                    if (i++ < (int)grp.size() - 1)
+                                    if (i++ < (int)grp.second.size() - 1)
                                         fout << " ";
                                 }
                                 fout << endl;
@@ -1201,15 +1318,14 @@ int main(int argc, char *argv[])
                 {
                     for (auto comp : *connected_comps)
                     {
-                        vector<int> tmp(comp.size());
+                        vector<int> tmp(comp.second.size() + 1);
                         int index = 0;
-                        for (auto v : comp)
-                        {
+                        tmp[index++] = (*head)[comp.first];
+                        for (auto v : comp.second)
                             tmp[index++] = v;
-                        }
                         MPI_Ssend(&index, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
                         // printf("rank = %d sent %d size\n", rank, index);
-                        MPI_Ssend(tmp.data(), (int)comp.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+                        MPI_Ssend(tmp.data(), (int)comp.second.size() + 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
                         // printf("rank = %d sent %d size\n", rank, (int)comp.size());
                     }
                     int c = -1;
@@ -1218,17 +1334,215 @@ int main(int argc, char *argv[])
                 }
 
                 MPI_Barrier(MPI_COMM_WORLD);
+                // }
+
+                // set<set<int>> *connected_comps = new set<set<int>>();
+                // map<int, int> *visited = new map<int, int>();
+                // queue<int> *trav = new queue<int>();
+                // auto it = (*edges).begin();
+
+                // while (true)
+                // {
+                //     while (it != (*edges).end() && (*visited)[(*it).first] == 1 && (*visited)[(*it).second] == 1)
+                //         it++;
+                //     if (it == (*edges).end())
+                //         break;
+
+                //     set<int> *grp_verts = new set<int>();
+                //     if ((*visited)[(*it).first] == 0)
+                //     {
+                //         (*trav).push((*it).first);
+                //         (*visited)[(*it).first] = 1;
+                //     }
+                //     if ((*visited)[(*it).second] == 0)
+                //     {
+                //         (*trav).push((*it).second);
+                //         (*visited)[(*it).second] = 1;
+                //     }
+                //     while ((*trav).size() > 0)
+                //     {
+                //         int i = (*trav).front();
+                //         (*trav).pop();
+                //         grp_verts->insert(i);
+                //         (*visited)[i] = 1;
+                //         for (int j : (*filtered_neighbors)[i])
+                //         {
+                //             if ((*visited)[j] == 0)
+                //             {
+                //                 (*trav).push(j);
+                //                 (*visited)[j] = 1;
+                //             }
+                //         }
+                //     }
+                //     connected_comps->insert(*grp_verts);
+                // }
+
+                // MPI_Barrier(MPI_COMM_WORLD);
+                // printf("hello2 %d\n", rank);
+
+                // printf("rank %d has size = %d for k = %d\n", rank, (int) connected_comps->size(),k);
+                //  for(auto x:(*connected_comps))
+                //  {
+                //      for(int v:x)
+                //      {
+                //          printf("rank %d has vert = %d ",  rank,v);
+                //      }
+                //      printf("\n");
+                //  }
+
+                // if (rank == 0)
+                // {
+
+                //     map<int, int> mp_rep;
+                //     map<int, set<int>> mp_comp;
+                //     int rep = 0;
+                //     for (auto comp : *connected_comps)
+                //     {
+                //         for (auto v : comp)
+                //         {
+                //             mp_rep[v] = rep;
+                //         }
+                //         mp_comp[rep] = comp;
+                //         rep++;
+                //     }
+
+                //     // printf("rank 0 is here\n");
+
+                //     int num_fin = 0;
+
+                //     while (num_fin != size - 1)
+                //     {
+                //         MPI_Status stat;
+
+                //         set<int> *recv_conn_comp = new set<int>();
+
+                //         int len;
+
+                //         MPI_Recv(&len, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &stat);
+
+                //         // printf("rank 0 got1  %d\n",len);
+
+                //         if (len == -1)
+                //         {
+                //             num_fin++;
+                //             // printf("num_fin = %d\n",num_fin);
+                //             continue;
+                //         }
+                //         int vec[len];
+                //         MPI_Recv(vec, len, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &stat);
+
+                //         // printf("rank 0 got2 %d\n",len);
+
+                //         int flag = 0;
+
+                //         set<set<int>> comps_to_be_del;
+                //         set<int> comp_fin;
+                //         set<int> visited;
+                //         for (int in = 0; in < len; ++in)
+                //         {
+                //             int v = vec[in];
+                //             if (mp_rep.find(v) != mp_rep.end())
+                //             {
+                //                 flag++;
+                //                 auto comp = mp_comp[mp_rep[v]];
+
+                //                 if (visited.find(mp_rep[v]) == visited.end())
+                //                 {
+                //                     comps_to_be_del.insert(comp);
+                //                     comp_fin.insert(comp.begin(), comp.end());
+                //                     visited.insert(mp_rep[v]);
+                //                 }
+                //             }
+                //         }
+                //         // printf("%d\n", flag);
+                //         if (flag != 0)
+                //         {
+                //             for (int in = 0; in < len; ++in)
+                //             {
+                //                 comp_fin.insert(vec[in]);
+                //             }
+                //             for (auto comp : comps_to_be_del)
+                //             {
+                //                 connected_comps->erase(comp);
+                //             }
+                //             connected_comps->insert(comp_fin);
+                //             for (auto v : comp_fin)
+                //             {
+                //                 mp_rep[v] = rep;
+                //             }
+                //             mp_comp[rep] = comp_fin;
+                //             rep++;
+                //         }
+                //         else
+                //         {
+                //             set<int> recv_conn_comp;
+                //             for (int in = 0; in < len; ++in)
+                //             {
+                //                 int v = vec[in];
+                //                 mp_rep[v] = rep;
+                //                 recv_conn_comp.insert(v);
+                //             }
+                //             mp_comp[rep] = recv_conn_comp;
+                //             rep++;
+                //             connected_comps->insert(recv_conn_comp);
+                //         }
+                //         // printf("%d\n", connected_comps->size());
+                //     }
+                //     // printf("%d\n", connected_comps->size());
+                //     if ((*connected_comps).size() == 0)
+                //         fout << 0 << endl;
+                //     else
+                //     {
+                //         fout << 1 << endl;
+                //         if (verbose == 1)
+                //         {
+                //             fout << (int)(*connected_comps).size() << endl;
+                //             for (auto grp : (*connected_comps))
+                //             {
+                //                 int i = 0;
+                //                 for (int v : grp)
+                //                 {
+                //                     fout << v;
+                //                     if (i++ < (int)grp.size() - 1)
+                //                         fout << " ";
+                //                 }
+                //                 fout << endl;
+                //             }
+                //         }
+                //     }
+                // }
+                // else
+                // {
+                //     for (auto comp : *connected_comps)
+                //     {
+                //         vector<int> tmp(comp.size());
+                //         int index = 0;
+                //         for (auto v : comp)
+                //         {
+                //             tmp[index++] = v;
+                //         }
+                //         MPI_Ssend(&index, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+                //         // printf("rank = %d sent %d size\n", rank, index);
+                //         MPI_Ssend(tmp.data(), (int)comp.size(), MPI_INT, 0, 1, MPI_COMM_WORLD);
+                //         // printf("rank = %d sent %d size\n", rank, (int)comp.size());
+                //     }
+                //     int c = -1;
+                //     MPI_Ssend(&c, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+                //     // printf("rank = %d sent -1\n", rank);
+                // }
+
+                // MPI_Barrier(MPI_COMM_WORLD);
             }
         }
     }
-    // if (rank == 0)
-    // {
-    //     // fout.close();
+    if (rank == 0)
+    {
+        // fout.close();
 
-    //     //end_final = chrono::system_clock::now();
-    //     //elapsed_ms = end_final - start_final;
-    //     //std::cout << "Time to end program: " << 1000 * elapsed_ms.count() << " milliseconds\n";
-    // }
+        end_final = chrono::system_clock::now();
+        chrono::duration<double> elapsed_ms = end_final - start_final;
+        std::cout << "Time to end program: " << 1000 * elapsed_ms.count() << " milliseconds\n";
+    }
 
     MPI_Finalize();
 }
