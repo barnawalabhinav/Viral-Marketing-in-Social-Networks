@@ -7,8 +7,7 @@ using namespace std;
 typedef unsigned int uint;
 typedef long long ll;
 
-typedef struct
-{
+typedef struct {
     int x;
     int y;
 } Pair;
@@ -49,11 +48,6 @@ int main(int argc, char *argv[])
             std::cout << "Usage: " << argv[0] << " [--optional value] [--help]\n";
             return 0;
         }
-        else
-        {
-            std::cerr << "Invalid option: " << arg << "\n";
-            return 1;
-        }
     }
     if (inputpath.length() == 0 || headerpath.length() == 0)
     {
@@ -61,7 +55,13 @@ int main(int argc, char *argv[])
         abort();
     }
 
-    MPI_Init(&argc, &argv);
+    int provided;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+    if (provided != MPI_THREAD_MULTIPLE)
+    {
+        printf("MPI_THREAD_MULTIPLE not supported\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -374,23 +374,23 @@ int main(int argc, char *argv[])
                 queue_send.emplace_back(j);
                 queue_recv.emplace_back(i);
                 queue_recv.emplace_back(j);
-                atomic_fetch_add(&flag, 1);
+                atomic_fetch_add(&tag, 1);
             }
             else
                 it++;
         }
 
-#pragma omp parallel num_threads(3)
+        
+
+        #pragma omp parallel num_threads(3)
         {
             int tid = omp_get_thread_num();
 
             if (tid == 0)
             {
                 int have_sent = 0;
-                while (flag == 0)
-                {
-                    if (queue_send.size() >= 2)
-                    {
+                while(flag.load() == 0) {
+                    if (queue_send.size() >= 2) {
                         int e1 = queue_send.front();
                         queue_send.pop_front();
                         int e2 = queue_send.front();
@@ -399,31 +399,24 @@ int main(int argc, char *argv[])
                         pii.x = e1;
                         pii.y = e2;
 
-                        for (int i = 0; i < size; ++i)
-                        {
-                            if (i != rank)
-                            {
-                                printf("rank %d sent {%d,%d} to %d\n", rank, e1, e2, i);
-                                MPI_Send(&pii, 1, PairType, i, tag, MPI_COMM_WORLD);
+                        for (int i=0; i<size; ++i) {
+                            if (i != rank) {
+                                printf("rank %d sent {%d,%d} to %d\n", rank,e1,e2, i);
+                                MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
                             }
                         }
-                        have_sent = 0;
-                    }
-                    else
-                    {
-                        if (shared != 0 || have_sent == 0)
-                        {
+                        have_sent=0;
+                    }else {
+                        if (shared != 0 || have_sent == 0) {
                             Pair pii;
                             pii.x = -1;
                             pii.y = -1;
                             printf("tid 0 sent -1\n");
 
-                            for (int i = 0; i < size; ++i)
-                            {
-                                if (i != rank)
-                                {
+                            for (int i=0; i<size; ++i) {
+                                if (i != rank) {
                                     printf("rank %d  sent -1 to %d\n", rank, i);
-                                    MPI_Send(&pii, 1, PairType, i, tag, MPI_COMM_WORLD);
+                                    MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
                                 }
                             }
                             have_sent = 1;
@@ -431,74 +424,48 @@ int main(int argc, char *argv[])
                         shared = 0;
                     }
                 }
+            
             }
 
-            if (tid == 1)
+
+            if (tid == 1) 
             {
                 MPI_Status status;
-                set<int> vis_source;
-                set<int> vis_tag;
-                vector<int> latest_tags(size - 1, -1);
-                while (flag == 0)
-                {
+                set<int>vis_source;
+                set<int>vis_tag;
+                while(flag.load() == 0) {
                     Pair pii;
                     MPI_Recv(&pii, 1, PairType, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-                    printf("rank %d recvd {%d,%d} from %d with tag %d\n", rank, pii.x, pii.y, status.MPI_SOURCE, status.MPI_TAG);
+                    printf("rank %d recvd {%d,%d}\n", rank, pii.x, pii.y);
 
-                    if (pii.x == -1)
-                    {
-                        assert(status.MPI_TAG >= latest_tags[status.MPI_SOURCE]);
-                        latest_tags[status.MPI_SOURCE] = status.MPI_TAG;
+                    if (pii.x == -1) {
+                        vis_source.insert(status.MPI_SOURCE);
+                        vis_tag.insert(status.MPI_TAG);
 
-                        bool stop = true;
-                        for (int i = 0; i < size - 1; ++i)
-                        {
-                            if (i != rank && latest_tags[i] != tag)
-                            {
-                                stop = false;
+                        if (vis_source.size() == size - 1) {
+                            if (vis_tag.size() == 1 && (*vis_tag.begin()) == tag && queue_send.size() == 0) {
+                                atomic_fetch_add(&flag, 1);
                                 break;
+                            }else{
+                                vis_source.clear();
+                                vis_tag.clear();
                             }
                         }
-                        
-                        if (stop) {
-                            atomic_fetch_add(&flag, 1);
-                            cout << "Broken\n";
-                            break;
-                        }
-
-                        // if (tag == latest_tag && queue_send.size() == 0)
-                        // {
-                        //     flag = 1;
-                        //     break;
-                        // }
-
-                        // vis_source.insert(status.MPI_SOURCE);
-                        // vis_tag.insert(status.MPI_TAG);
-
-                        // if (vis_source.size() == size - 1) {
-                        //     if (vis_tag.size() == 1 && (*vis_tag.begin()) == tag && queue_send.size() == 0) {
-                        //         flag = 1;
-                        //         break;
-                        //     }else{
-                        //         vis_source.clear();
-                        //         vis_tag.clear();
-                        //     }
-                        // }
-                    }
+                    } 
                     else
                     {
                         vis_source.clear();
                         vis_tag.clear();
                         queue_recv.emplace_back(pii.x);
                         queue_recv.emplace_back(pii.y);
-                        atomic_fetch_add(&flag, 1);
+                        atomic_fetch_add(&tag, 1);  
                     }
+                    
                 }
-            }
+            }    
 
-            if (tid == 2)
-            {
-                while (flag == 0)
+            if (tid == 2) {
+                while (flag.load() == 0)
                 {
                     if (queue_recv.size() >= 2)
                     {
@@ -515,14 +482,14 @@ int main(int argc, char *argv[])
                             int z = max(j, p);
                             if ((*triangles)[{w, x}].find(j) != (*triangles)[{w, x}].end())
                                 (*triangles)[{w, x}].erase(j);
-
+                            
                             if ((int)(triangles->at({w, x})).size() < k)
                             {
-                                edges->erase({w, x});
+                                edges->erase({w,x});
                                 queue_send.emplace_back(w);
                                 queue_send.emplace_back(x);
                                 atomic_fetch_add(&shared, 1);
-                                atomic_fetch_add(&flag, 1);
+                                atomic_fetch_add(&tag, 1);
                             }
 
                             if ((*triangles)[{y, z}].find(i) != (*triangles)[{y, z}].end())
@@ -530,89 +497,23 @@ int main(int argc, char *argv[])
 
                             if ((int)(triangles->at({y, z})).size() < k)
                             {
-                                edges->erase({y, z});
+                                edges->erase({y,z});
                                 queue_send.emplace_back(y);
                                 queue_send.emplace_back(z);
                                 atomic_fetch_add(&shared, 1);
                                 atomic_fetch_add(&tag, 1);
                             }
                         }
-                        // (*neighbors)[i].erase(j);
-                        // (*neighbors)[j].erase(i);
-                    }
+                        (*neighbors)[i].erase(j);
+                        (*neighbors)[j].erase(i);
                 }
-                printf("%d flag", flag.load());
-                printf("%d tag", tag.load());
+
             }
+            printf("%d flag", flag.load());
+            printf("%d tag", tag.load());
+
         }
-        /************ TEST FOR THE OUTPUT CORRECTNESS BEGINS ************/
-
-        // printf("Edges size = %d\n", edges->size());
-        // MPI_Barrier(MPI_COMM_WORLD);
-
-        // set<int> *grp_verts = new set<int>();
-
-        // for (pair<int, int> e : (*edges))
-        // {
-        //     grp_verts->insert(e.first);
-        //     grp_verts->insert(e.second);
-        // }
-        // // printf("grp_verts size : %d\n", (int)grp_verts->size());
-
-        // // for (int i : *grp_verts)
-        // //     printf("%d\n", i);
-
-        // vector<int> group(grp_verts->begin(), grp_verts->end());
-        // int sendcount = (int)group.size(), recvcounts[size], displs[size], totalcount = 0;
-
-        // // printf("size %d\n", group.size());
-
-        // MPI_Barrier(MPI_COMM_WORLD);
-        // MPI_Gather(&sendcount, 1, MPI_INT, &recvcounts[0], 1, MPI_INT, 0, MPI_COMM_WORLD);
-        // MPI_Barrier(MPI_COMM_WORLD);
-
-        // vector<int> *recvbuf;
-
-        // if (rank == 0)
-        // {
-        //     displs[0] = 0;
-        //     for (int i = 1; i < size; i++)
-        //         displs[i] = displs[i - 1] + recvcounts[i - 1];
-        //     totalcount = displs[size - 1] + recvcounts[size - 1];
-        //     // printf("totalcount %d\n", totalcount);
-        //     recvbuf = new vector<int>(totalcount);
-        // }
-
-        // MPI_Barrier(MPI_COMM_WORLD);
-        // MPI_Gatherv(group.data(), sendcount, MPI_INT, recvbuf->data(), recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
-        // MPI_Barrier(MPI_COMM_WORLD);
-
-        // // set<int> *grp_verts_all = new set<int>(recvbuf->begin(), recvbuf->end());
-        // // if (grp_verts_all->size() == 0)
-        // //     finished = true;
-
-        // if (rank == 0)
-        // {
-        //     set<int> *grp_verts_all = new set<int>(recvbuf->begin(), recvbuf->end());
-        //     if (grp_verts_all->size() == 0)
-        //     {
-        //         printf("0\n");
-        //     }
-        //     else
-        //     {
-        //         printf("1\n");
-        //         int j = grp_verts_all->size() - 1;
-        //         for (int i : (*grp_verts_all))
-        //         {
-        //             printf("%d", i);
-        //             if (j-- > 0)
-        //                 printf(" ");
-        //         }
-        //         printf("\n");
-        //     }
-        // }
-
-        /************ TEST FOR THE OUTPUT CORRECTNESS ENDS ************/
+        }
 
         end = chrono::system_clock::now();
         elapsed_ms = end - start;
@@ -668,22 +569,6 @@ int main(int argc, char *argv[])
             {
                 start = chrono::system_clock::now();
 
-                // printf("hello1\n");
-
-                // set<int> *grp_verts = new set<int>();
-
-                // for (pair<int, int> e : (*edges))
-                // {
-                //     grp_verts->insert(e.first);
-                //     grp_verts->insert(e.second);
-                // }
-
-                // for(auto v:(*grp_verts))
-                // {
-                //     printf("rank %d has vert = %d", rank, v);
-                // }
-                // printf("\n");
-
                 vector<int> *edge_to_vert = new vector<int>();
                 for (auto e : *edges)
                 {
@@ -725,14 +610,7 @@ int main(int argc, char *argv[])
                     totalcount = displs[size - 1] + recvcounts[size - 1];
 
                     recvbuf = (int *)malloc(totalcount * sizeof(int));
-                    // printf("totalcount %d\n", totalcount);
-
-                    // MPI_Barrier(MPI_COMM_WORLD);
                     MPI_Gatherv(edge_to_vert->data(), sendcount, MPI_INT, recvbuf, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
-                    // printf("rank %d has %d count\n", rank, sendcount);
-                    //  MPI_Barrier(MPI_COMM_WORLD);
-                    // chrono::time_point<std::chrono::system_clock> gather_end = chrono::system_clock::now();
-                    // g_time += gather_end - gather_beg;
 
                     vector<pair<int, int>> *all_edges = new vector<pair<int, int>>();
                     vector<set<int>> *all_neighbors = new vector<set<int>>(n);
