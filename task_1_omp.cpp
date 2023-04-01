@@ -359,6 +359,11 @@ int main(int argc, char *argv[])
         atomic_int shared(0);
 
         auto it = (*edges).begin();
+
+
+        mutex msend;
+        mutex mrecv;
+
         while (it != edges->end())
         {
             pair<int, int> e = *it;
@@ -369,11 +374,17 @@ int main(int argc, char *argv[])
                 deletable->push_back(i);
                 deletable->push_back(j);
                 it = edges->erase(it);
+                msend.lock();
                 queue_send.emplace_back(i);
 
                 queue_send.emplace_back(j);
+                msend.unlock();
+
+                mrecv.lock();
                 queue_recv.emplace_back(i);
                 queue_recv.emplace_back(j);
+                mrecv.unlock();
+
                 atomic_fetch_add(&tag, 1);
             }
             else
@@ -390,24 +401,32 @@ int main(int argc, char *argv[])
             {
                 int have_sent = 0;
                 while(flag.load() == 0) {
-                    if (queue_send.size() >= 2) {
+                    msend.lock();
+                    int sz = queue_send.size();
+                    msend.unlock();
+
+                    if (sz >= 2) {
+                        msend.lock();
                         int e1 = queue_send.front();
                         queue_send.pop_front();
                         int e2 = queue_send.front();
                         queue_send.pop_front();
+                        msend.unlock();
                         Pair pii;
                         pii.x = e1;
                         pii.y = e2;
 
                         for (int i=0; i<size; ++i) {
                             if (i != rank) {
-                                printf("rank %d sent {%d,%d} to %d\n", rank,e1,e2, i);
-                                MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                                printf("rank %d sent {%d,%d} to %d with tag %d\n", rank,e1,e2, i, tag.load());
+                                MPI_Send(&pii, 1 , PairType, i, tag.load(), MPI_COMM_WORLD);
                             }
                         }
                         have_sent=0;
-                    }else {
-                        if (shared != 0 || have_sent == 0) {
+                    }else if (sz == 1){
+                        continue;
+                    }else{
+                        if (shared.load() != 0 || have_sent == 0) {
                             Pair pii;
                             pii.x = -1;
                             pii.y = -1;
@@ -415,13 +434,13 @@ int main(int argc, char *argv[])
 
                             for (int i=0; i<size; ++i) {
                                 if (i != rank) {
-                                    printf("rank %d  sent -1 to %d\n", rank, i);
-                                    MPI_Send(&pii, 1 , PairType, i, tag, MPI_COMM_WORLD);
+                                    printf("rank %d  sent -1 to %d with tag %d\n", rank, i, tag.load());
+                                    MPI_Send(&pii, 1 , PairType, i, tag.load(), MPI_COMM_WORLD);
                                 }
                             }
                             have_sent = 1;
                         }
-                        shared = 0;
+                        shared=0;
                     }
                 }
             
@@ -433,32 +452,47 @@ int main(int argc, char *argv[])
                 MPI_Status status;
                 set<int>vis_source;
                 set<int>vis_tag;
+                vector<int> latest_tags(size - 1, -1);
+
                 while(flag.load() == 0) {
                     Pair pii;
                     MPI_Recv(&pii, 1, PairType, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-                    printf("rank %d recvd {%d,%d}\n", rank, pii.x, pii.y);
+                    printf("rank %d recvd {%d,%d} with tag %d from src %d\n", rank, pii.x, pii.y, status.MPI_TAG, status.MPI_SOURCE);
 
                     if (pii.x == -1) {
-                        vis_source.insert(status.MPI_SOURCE);
-                        vis_tag.insert(status.MPI_TAG);
+                        assert(status.MPI_TAG >= latest_tags[status.MPI_SOURCE]);
+                        latest_tags[status.MPI_SOURCE] = status.MPI_TAG;
 
-                        if (vis_source.size() == size - 1) {
-                            if (vis_tag.size() == 1 && (*vis_tag.begin()) == tag && queue_send.size() == 0) {
-                                atomic_fetch_add(&flag, 1);
+                        bool stop = true;
+                        for (int i = 0; i < size - 1; ++i)
+                        {
+                            if (i != rank && latest_tags[i] != tag)
+                            {
+                                stop = false;
                                 break;
-                            }else{
-                                vis_source.clear();
-                                vis_tag.clear();
                             }
+                        }
+                        printf("helo\n");
+                        msend.lock();
+                        int sz = queue_send.size();
+                        msend.unlock();
+                        printf("size of rank %d is %d\n", rank, sz);
+
+                        if (stop && sz == 0) {
+                            flag = 1;
+                            cout << "Broken\n";
+                            break;
                         }
                     } 
                     else
                     {
                         vis_source.clear();
                         vis_tag.clear();
+                        mrecv.lock();
                         queue_recv.emplace_back(pii.x);
                         queue_recv.emplace_back(pii.y);
-                        atomic_fetch_add(&tag, 1);  
+                        mrecv.unlock();
+                        
                     }
                     
                 }
@@ -466,13 +500,20 @@ int main(int argc, char *argv[])
 
             if (tid == 2) {
                 while (flag.load() == 0)
-                {
-                    if (queue_recv.size() >= 2)
+                {   mrecv.lock();
+                    int sz = queue_recv.size();
+                    mrecv.unlock();
+
+                    if (sz >= 2)
                     {
+                        mrecv.lock();
                         int i = queue_recv.front();
                         queue_recv.pop_front();
                         int j = queue_recv.front();
                         queue_recv.pop_front();
+                        mrecv.unlock();
+
+                        atomic_fetch_add(&tag, 1);  
 
                         for (int p : (*triangles)[{i, j}])
                         {
@@ -486,9 +527,12 @@ int main(int argc, char *argv[])
                             if ((int)(triangles->at({w, x})).size() < k)
                             {
                                 edges->erase({w,x});
+
+                                msend.lock();
                                 queue_send.emplace_back(w);
                                 queue_send.emplace_back(x);
-                                atomic_fetch_add(&shared, 1);
+                                msend.unlock();
+
                                 atomic_fetch_add(&tag, 1);
                             }
 
@@ -498,12 +542,17 @@ int main(int argc, char *argv[])
                             if ((int)(triangles->at({y, z})).size() < k)
                             {
                                 edges->erase({y,z});
+
+                                msend.lock();
                                 queue_send.emplace_back(y);
                                 queue_send.emplace_back(z);
-                                atomic_fetch_add(&shared, 1);
+                                msend.unlock();
+
                                 atomic_fetch_add(&tag, 1);
                             }
                         }
+                        atomic_fetch_add(&shared, 1);
+
                         (*neighbors)[i].erase(j);
                         (*neighbors)[j].erase(i);
                 }
@@ -514,6 +563,8 @@ int main(int argc, char *argv[])
 
         }
         }
+
+        MPI_Barrier(MPI_COMM_WORLD);
 
         end = chrono::system_clock::now();
         elapsed_ms = end - start;
