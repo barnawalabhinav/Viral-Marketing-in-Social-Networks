@@ -1,8 +1,5 @@
-// TODO : Change filesize > Maxfilesize to filesize < Maxfilesize
-
 #include <bits/stdc++.h>
 #include <mpi.h>
-#include <omp.h>
 
 using namespace std;
 
@@ -10,16 +7,14 @@ typedef unsigned int uint;
 typedef long long ll;
 
 #define deg(i) neighbors[i].size()
-#define get_node_rank(i) (i / (n / size))
 
 int main(int argc, char *argv[])
 {
     /***************** PARSE CMD LINE ARGS *****************/
 
     int taskid = 1;
-    int task_p = 1;
     int verbose = 0;
-    int startk = -1;
+    int startk = 2;
     int endk = 2;
     string inputpath = "";
     string headerpath = "";
@@ -42,8 +37,6 @@ int main(int argc, char *argv[])
             startk = stoi(arg.substr(9, arg.length() - 9));
         else if (arg.substr(0, 6) == "--endk")
             endk = stoi(arg.substr(7, arg.length() - 7));
-        else if (arg.substr(0, 3) == "--p")
-            task_p = stoi(arg.substr(4, arg.length() - 4));
         else if (arg == "--help")
         {
             std::cout << "Usage: " << argv[0] << " [--optional value] [--help]\n";
@@ -55,16 +48,13 @@ int main(int argc, char *argv[])
         std::cout << "Optional argument not provided\n";
         abort();
     }
-    if (taskid == 2)
-        startk = endk;
-
-    int provided;
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-    if (provided != MPI_THREAD_MULTIPLE)
+    if (taskid != 1) // only task 1 is implemented
     {
-        printf("MPI_THREAD_MULTIPLE not supported\n");
-        MPI_Abort(MPI_COMM_WORLD, 1);
+        std::cout << "Task " << taskid << " not implemented\n";
+        abort();
     }
+
+    MPI_Init(&argc, &argv);
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -88,11 +78,8 @@ int main(int argc, char *argv[])
 
     set<pair<int, int>> *edges = new set<pair<int, int>>();
     vector<set<int>> *neighbors = new vector<set<int>>(n);
-    vector<set<int>> *filtered_neighbors = new vector<set<int>>(n);
 
     int degi, node, p, offset, flag, node_bufj, nodej;
-
-    /*************** VERTEX DIVISION OF GRPAH ***************/
 
     if (rank != size - 1)
     {
@@ -117,7 +104,6 @@ int main(int argc, char *argv[])
                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                 p += 4;
                 (*neighbors)[node].insert(nodej);
-                (*filtered_neighbors)[node].insert(nodej);
                 if (node < nodej)
                     edges->insert({node, nodej});
             }
@@ -147,7 +133,6 @@ int main(int argc, char *argv[])
                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                 p += 4;
                 (*neighbors)[node].insert(nodej);
-                (*filtered_neighbors)[node].insert(nodej);
                 if (node < nodej)
                     edges->insert({node, nodej});
             }
@@ -155,7 +140,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    // if (size == 1)
+    // if (rank == 0)
     // {
     //     for (int i = 0; i < n; ++i)
     //     {
@@ -183,185 +168,119 @@ int main(int argc, char *argv[])
     //                 if (edges->find({node, nodej}) == edges->end())
     //                 {
     //                     edges->insert({node, nodej});
+
+    //                     if ((int) edges->size() == m / size)
+    //                     {
+    //                         flag = 1;
+    //                         node_bufj = p;
+    //                         break;
+    //                     }
     //                 }
     //             }
     //         }
-    //         std::free(buf);
+    //         free(buf);
+    //         if (flag == 1)
+    //         {
+    //             MPI_Send(&node, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
+    //             MPI_Send(&node_bufj, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
+    //             break;
+    //         }
+    //     }
+    // }
+    // else if (rank == size - 1)
+    // {
+    //     MPI_Recv(&node, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    //     MPI_Recv(&node_bufj, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    //     p = node_bufj;
+    //     for (int i = node; i < n; ++i)
+    //     {
+    //         node = i;
+    //         fseek(header, 4 * node, SEEK_SET);
+    //         read = fread(buffer, sizeof(buffer), 1, header);
+
+    //         offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+    //         fseek(ptr, offset + 4, SEEK_SET);
+    //         read = fread(buffer, sizeof(buffer), 1, ptr);
+
+    //         degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+
+    //         unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
+    //         read = fread(buf, degi * sizeof(int), 1, ptr);
+
+    //         flag = 0;
+
+    //         for (int j = p / 4; j < degi; ++j)
+    //         {
+    //             nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
+    //             p += 4;
+
+    //             if (node < nodej)
+    //             {
+    //                 if (edges->find({node, nodej}) == edges->end())
+    //                 {
+    //                     edges->insert({node, nodej});
+    //                 }
+    //             }
+    //         }
+    //         free(buf);
+    //         p = 0;
     //     }
     // }
     // else
     // {
-    //     if (rank == 0)
+    //     MPI_Recv(&node, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    //     MPI_Recv(&node_bufj, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    //     p = node_bufj;
+    //     for (int i = node; i < n; ++i)
     //     {
-    //         for (int i = 0; i < n; ++i)
+    //         node = i;
+    //         fseek(header, 4 * node, SEEK_SET);
+    //         read = fread(buffer, sizeof(buffer), 1, header);
+
+    //         offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+    //         fseek(ptr, offset + 4, SEEK_SET);
+    //         read = fread(buffer, sizeof(buffer), 1, ptr);
+
+    //         degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+
+    //         unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
+    //         read = fread(buf, degi * sizeof(int), 1, ptr);
+
+    //         flag = 0;
+    //         for (int j = p / 4; j < degi; ++j)
     //         {
-    //             node = i, p = 0;
-    //             fseek(header, 4 * node, SEEK_SET);
-    //             read = fread(buffer, sizeof(buffer), 1, header);
+    //             nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
+    //             p += 4;
 
-    //             offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-    //             fseek(ptr, offset + 4, SEEK_SET);
-    //             read = fread(buffer, sizeof(buffer), 1, ptr);
-
-    //             degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-
-    //             unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
-    //             read = fread(buf, degi * sizeof(int), 1, ptr);
-
-    //             int flag = 0, node_bufj;
-    //             for (int j = 0; j < degi; ++j)
+    //             if (node < nodej)
     //             {
-    //                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
-    //                 p += 4;
-
-    //                 if (node < nodej)
+    //                 if (edges->find({node, nodej}) == edges->end())
     //                 {
-    //                     if (edges->find({node, nodej}) == edges->end())
+    //                     edges->insert({node, nodej});
+    //                     if ((int) edges->size() == m / size)
     //                     {
-    //                         edges->insert({node, nodej});
-
-    //                         if ((int)edges->size() == m / size)
-    //                         {
-    //                             flag = 1;
-    //                             node_bufj = p;
-    //                             break;
-    //                         }
+    //                         flag = 1;
+    //                         node_bufj = p;
+    //                         break;
     //                     }
     //                 }
-    //             }
-    //             std::free(buf);
-    //             if (flag == 1)
-    //             {
-    //                 MPI_Send(&node, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
-    //                 MPI_Send(&node_bufj, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
-    //                 break;
     //             }
     //         }
-    //     }
-    //     else if (rank == size - 1)
-    //     {
-    //         MPI_Recv(&node, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    //         MPI_Recv(&node_bufj, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-    //         p = node_bufj;
-    //         for (int i = node; i < n; ++i)
+    //         free(buf);
+    //         p = 0;
+    //         if (flag == 1)
     //         {
-    //             node = i;
-    //             fseek(header, 4 * node, SEEK_SET);
-    //             read = fread(buffer, sizeof(buffer), 1, header);
-
-    //             offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-    //             fseek(ptr, offset + 4, SEEK_SET);
-    //             read = fread(buffer, sizeof(buffer), 1, ptr);
-
-    //             degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-
-    //             unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
-    //             read = fread(buf, degi * sizeof(int), 1, ptr);
-
-    //             flag = 0;
-
-    //             for (int j = p / 4; j < degi; ++j)
-    //             {
-    //                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
-    //                 p += 4;
-
-    //                 if (node < nodej)
-    //                 {
-    //                     if (edges->find({node, nodej}) == edges->end())
-    //                     {
-    //                         edges->insert({node, nodej});
-    //                     }
-    //                 }
-    //             }
-    //             std::free(buf);
-    //             p = 0;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         MPI_Recv(&node, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    //         MPI_Recv(&node_bufj, 1, MPI_INT, rank - 1, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-    //         p = node_bufj;
-    //         for (int i = node; i < n; ++i)
-    //         {
-    //             node = i;
-    //             fseek(header, 4 * node, SEEK_SET);
-    //             read = fread(buffer, sizeof(buffer), 1, header);
-
-    //             offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-    //             fseek(ptr, offset + 4, SEEK_SET);
-    //             read = fread(buffer, sizeof(buffer), 1, ptr);
-
-    //             degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-
-    //             unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
-    //             read = fread(buf, degi * sizeof(int), 1, ptr);
-
-    //             flag = 0;
-    //             for (int j = p / 4; j < degi; ++j)
-    //             {
-    //                 nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
-    //                 p += 4;
-
-    //                 if (node < nodej)
-    //                 {
-    //                     if (edges->find({node, nodej}) == edges->end())
-    //                     {
-    //                         edges->insert({node, nodej});
-    //                         if ((int)edges->size() == m / size)
-    //                         {
-    //                             flag = 1;
-    //                             node_bufj = p;
-    //                             break;
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             std::free(buf);
-    //             p = 0;
-    //             if (flag == 1)
-    //             {
-    //                 MPI_Send(&node, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
-    //                 MPI_Send(&node_bufj, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
-    //                 break;
-    //             }
+    //             MPI_Send(&node, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
+    //             MPI_Send(&node_bufj, 1, MPI_INT, rank + 1, 0, MPI_COMM_WORLD);
+    //             break;
     //         }
     //     }
     // }
+
     // vector<set<int>> *neighbors = new vector<set<int>>(n);
     // vector<bool> *visit = new vector<bool>(n, false);
-
-    // /************ FOR SEQUENTIAL INFLUENCER COMPUTATION ************
-    if (taskid == 2 && rank == 0)
-    {
-        for (int nd = (n / size); nd < n; ++nd)
-        {
-            int tmp_p = 0;
-            // printf("rank = %d has node = %d\n", rank, node);
-            fseek(header, 4 * nd, SEEK_SET);
-            read = fread(buffer, sizeof(buffer), 1, header);
-
-            offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-            fseek(ptr, offset + 4, SEEK_SET);
-            read = fread(buffer, sizeof(buffer), 1, ptr);
-
-            degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
-
-            unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
-            read = fread(buf, degi * sizeof(int), 1, ptr);
-
-            for (int j = 0; j < degi; ++j)
-            {
-                nodej = (buf[tmp_p] & 0xFF) | ((buf[tmp_p + 1] & 0xFF) << 8) | ((buf[tmp_p + 2] & 0xFF) << 16) | ((buf[tmp_p + 3] & 0xFF) << 24);
-                tmp_p += 4;
-                (*neighbors)[nd].insert(nodej);
-            }
-            free(buf);
-        }
-    }
-    // ************ FOR SEQUENTIAL INFLUENCER COMPUTATION ************/
 
     for (pair<int, int> edge : *edges)
     {
@@ -394,7 +313,6 @@ int main(int argc, char *argv[])
                     nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                     p += 4;
                     (*neighbors)[nd].insert(nodej);
-                    (*filtered_neighbors)[nd].insert(nodej);
                 }
                 std::free(buf);
             }
@@ -443,7 +361,6 @@ int main(int argc, char *argv[])
     // bool finished = false;
     for (int k = startk; k <= endk; k++)
     {
-        // cout << k << endl;
         // printf("%d: Edges size = %d\n", k, edges->size());
         // chrono::duration<double> g_time = chrono::system_clock::now() - chrono::system_clock::now();
         while (true)
@@ -539,9 +456,8 @@ int main(int argc, char *argv[])
                     // if (graph[j * n + p] < k)
                     //     deletable.push({y, z});
                 }
-
-                (*filtered_neighbors)[i].erase(j);
-                (*filtered_neighbors)[j].erase(i);
+                (*neighbors)[i].erase(j);
+                (*neighbors)[j].erase(i);
 
                 // for (int p : (*neighbors)[i])
                 // {
@@ -647,7 +563,7 @@ int main(int argc, char *argv[])
         // elapsed_ms = end - start;
         // std::printf("Time to find %d-truss: %f milliseconds\n", k, 1000 * elapsed_ms.count());
 
-        if (taskid == 1 && verbose == 0)
+        if (verbose == 0)
         {
             int *recvcounts = NULL;
             if (rank == 0)
@@ -688,17 +604,11 @@ int main(int argc, char *argv[])
         }
         else
         {
-            // int last_node = (rank == size - 1) ? n : (rank + 1) * (n / size);
-            // int first_node = rank * (n / size);
-            // int num_nodes = last_node - first_node;
-            // vector<int> *head = new vector<int>(num_nodes, -1);
-
             ifstream file(inputpath.c_str(), ios::binary);
             file.seekg(0, ios::end);
             int filesize = file.tellg();
 
             int MAXFILESIZE = 0.5 * (1000000000);
-
             if (filesize > MAXFILESIZE)
             {
                 // start = chrono::system_clock::now();
@@ -734,31 +644,15 @@ int main(int argc, char *argv[])
 
                 // printf("hello1\n");
 
-                map<int, set<int>> *connected_comps = new map<int, set<int>>();
-
                 if (rank != 0)
                 {
                     MPI_Gather(&sendcount, 1, MPI_INT, recvcounts, 1, MPI_INT, 0, MPI_COMM_WORLD);
                     // printf("rank %d has %d count\n", rank, sendcount);
                     MPI_Gatherv(edge_to_vert->data(), sendcount, MPI_INT, recvbuf, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
                     // printf("rank %d has %d count\n", rank, sendcount);
-                    // if (taskid == 2)
-                    // {
-                    //     int node_head[2];
-                    //     while (true)
-                    //     {
-                    //         MPI_Recv(&node_head, 2, MPI_INT, 0, 10, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    //         if (node_head[0] == -1)
-                    //             break;
-                    //         (*head)[node_head[0] - first_node] = node_head[1];
-                    //     }
-                    // }
                 }
                 else
                 {
-
-                    vector<int> *head = new vector<int>(n, -1);
-
                     recvcounts = (int *)malloc(size * sizeof(int));
 
                     MPI_Gather(&sendcount, 1, MPI_INT, recvcounts, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -796,6 +690,7 @@ int main(int argc, char *argv[])
                     }
                     // printf("hello2\n");
 
+                    set<set<int>> *connected_comps = new set<set<int>>();
                     map<int, int> *visited = new map<int, int>();
                     queue<int> *trav = new queue<int>();
                     auto it = (*all_edges).begin();
@@ -807,41 +702,21 @@ int main(int argc, char *argv[])
                         if (it == (*all_edges).end())
                             break;
 
-                        int tmp_head = -1;
                         set<int> *grp_verts = new set<int>();
                         if ((*visited)[(*it).first] == 0)
                         {
                             (*trav).push((*it).first);
-                            tmp_head = (*it).first;
                             (*visited)[(*it).first] = 1;
                         }
                         if ((*visited)[(*it).second] == 0)
                         {
                             (*trav).push((*it).second);
-                            if (tmp_head == -1)
-                                tmp_head = (*it).second;
                             (*visited)[(*it).second] = 1;
                         }
-                        if (tmp_head == -1)
-                            continue;
                         while ((*trav).size() > 0)
                         {
                             int i = (*trav).front();
                             (*trav).pop();
-                            int node_rank = get_node_rank(i);
-
-                            if (taskid == 2)
-                            {
-                                (*head)[i] = tmp_head;
-
-                                // if (node_rank == 0)
-                                //     (*head)[i] = tmp_head;
-                                // else
-                                // {
-                                //     int node_head[2] = {i, tmp_head};
-                                //     MPI_Send(&node_head, 2, MPI_INT, node_rank, 10, MPI_COMM_WORLD);
-                                // }
-                            }
                             grp_verts->insert(i);
                             (*visited)[i] = 1;
                             for (int j : (*all_neighbors)[i])
@@ -853,169 +728,33 @@ int main(int argc, char *argv[])
                                 }
                             }
                         }
-                        connected_comps->insert({tmp_head, *grp_verts});
+                        connected_comps->insert(*grp_verts);
                     }
 
-                    if (taskid == 1)
-                    {
-                        if ((*connected_comps).size() == 0)
-                            fout << 0 << endl;
-                        else
-                        {
-                            fout << 1 << endl;
-                            if (verbose == 1)
-                            {
-                                fout << (int)(*connected_comps).size() << endl;
-                                for (auto grp : (*connected_comps))
-                                {
-                                    int i = 0;
-                                    for (int v : grp.second)
-                                    {
-                                        fout << v;
-                                        if (i++ < (int)grp.second.size() - 1)
-                                            fout << " ";
-                                    }
-                                    fout << endl;
-                                }
-                            }
-                        }
-                    }
+                    if ((*connected_comps).size() == 0)
+                        fout << 0 << endl;
                     else
                     {
-                        // int node_head[2] = {-1, -1};
-                        // for (int node_rank = 1; node_rank < size; node_rank++)
-                        //     MPI_Send(&node_head, 2, MPI_INT, node_rank, 10, MPI_COMM_WORLD);
-
-                        // /************** CALCULATING INFLUENCER SEQUENTIALLY **************
-
-                        vector<set<int>> *conn_heads = new vector<set<int>>(n);
-                        vector<int> *influencer = new vector<int>();
-                        for (int vt = 0; vt < n; vt++)
+                        fout << 1 << endl;
+                        if (verbose == 1)
                         {
-                            if ((*head)[vt] != -1)
-                                (*conn_heads)[vt].insert((*head)[vt]);
-                            for (int i : (*neighbors)[vt])
+                            fout << (int)(*connected_comps).size() << endl;
+                            for (auto grp : (*connected_comps))
                             {
-                                if ((*head)[i] != -1)
-                                    (*conn_heads)[vt].insert((*head)[i]);
-                            }
-                            if ((*conn_heads)[vt].size() >= task_p)
-                                (*influencer).push_back(vt);
-                        }
-                        if (influencer->size() == 0)
-                            fout << 0 << endl;
-                        else
-                        {
-                            fout << influencer->size() << endl;
-                            for (int in_vt : (*influencer))
-                            {
-                                fout << in_vt << " ";
-                                if (verbose == 1)
+                                int i = 0;
+                                for (int v : grp)
                                 {
-                                    fout << "\n";
-                                    for (int i : (*conn_heads)[in_vt])
-                                        for (int j : (*connected_comps)[i])
-                                            fout << j << " ";
-                                    fout << endl;
+                                    fout << v;
+                                    if (i++ < (int)grp.size() - 1)
+                                        fout << " ";
                                 }
+                                fout << endl;
                             }
                         }
-                        // ************** CALCULATING INFLUENCER SEQUENTIALLY **************/
                     }
                 }
                 // printf("hello9\n");
                 MPI_Barrier(MPI_COMM_WORLD);
-
-                if (taskid == 2)
-                {
-                    //                     vector<set<int>> *conn_heads = new vector<set<int>>(num_nodes);
-                    //                     if (rank == 0)
-                    //                         conn_heads = new vector<set<int>>(n);
-
-                    // #pragma omp parallel num_threads(2)
-                    //                     {
-                    //                         int tid = omp_get_thread_num();
-                    //                         if (tid == 0)
-                    //                         {
-                    //                             for (int vert = first_node; vert < last_node; vert++)
-                    //                             {
-                    //                                 if ((*head)[vert] != -1)
-                    //                                     (*conn_heads)[vert - first_node].insert((*head)[vert]);
-                    //                                 for (int i : (*neighbors)[vert])
-                    //                                 {
-                    //                                     int node_rank = get_node_rank(i);
-                    //                                     if (node_rank == rank && (*head)[i] != -1)
-                    //                                         (*conn_heads)[vert - first_node].insert((*head)[i]);
-                    //                                     else
-                    //                                     {
-                    //                                         int node_head[2] = {i, -1};
-                    //                                         MPI_Send(&node_head, 1, MPI_INT, node_rank, 1, MPI_COMM_WORLD);
-                    //                                         MPI_Recv(&node_head, 2, MPI_INT, node_rank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    //                                         assert(node_head[0] == i);
-                    //                                         (*conn_heads)[vert - first_node].insert(node_head[1]);
-                    //                                     }
-                    //                                 }
-                    //                             }
-                    //                             int stop = -1;
-                    //                             for (int oth_rank = 0; oth_rank < size; oth_rank++)
-                    //                             {
-                    //                                 if (oth_rank == rank)
-                    //                                     continue;
-                    //                                 MPI_Send(&stop, 1, MPI_INT, oth_rank, 1, MPI_COMM_WORLD);
-                    //                             }
-                    //                         }
-                    //                         else
-                    //                         {
-                    //                             int node_head[2] = {-1, -1};
-                    //                             MPI_Status status;
-                    //                             int num_stop = size - 1;
-                    //                             while (num_stop)
-                    //                             {
-                    //                                 MPI_Recv(&node_head, 1, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
-                    //                                 if (node_head[0] == -1)
-                    //                                 {
-                    //                                     num_stop--;
-                    //                                     continue;
-                    //                                 }
-                    //                                 node_head[1] = (*head)[node_head[0] - first_node];
-                    //                                 MPI_Send(&node_head, 2, MPI_INT, status.MPI_SOURCE, 1, MPI_COMM_WORLD);
-                    //                             }
-                    //                         }
-                    //                     }
-                    //                     if (rank != 0)
-                    //                     {
-                    //                         for (int vt = first_node; vt < last_node; vt++)
-                    //                         {
-                    //                             int vert = vt - first_node;
-                    //                             if ((*conn_heads)[vert].size() < task_p)
-                    //                                 continue;
-                    //                             int sz = (*conn_heads)[vert].size();
-                    //                             int conn_node[sz + 1];
-                    //                             conn_node[0] = vt;
-                    //                             int itr = 1;
-                    //                             for (int ngbr : (*conn_heads)[vert])
-                    //                                 conn_node[itr++] = ngbr;
-                    //                             MPI_Send(&conn_node, 1 + sz, MPI_INT, 0, 9, MPI_COMM_WORLD);
-                    //                         }
-                    //                         int stop = -1;
-                    //                         MPI_Send(&stop, 1, MPI_INT, 0, 9, MPI_COMM_WORLD);
-                    //                     }
-                    //                     else
-                    //                     {
-                    //                         int num_stop = size - 1;
-                    //                         while (num_stop)
-                    //                         {
-                    //                             int tmp_conn[n];
-                    //                             MPI_Recv(&tmp_conn, n, MPI_INT, MPI_ANY_SOURCE, 9, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                    //                             if (tmp_conn[0] == -1)
-                    //                             {
-                    //                                 num_stop--;
-                    //                                 continue;
-                    //                             }
-                    //                         }
-                    //                     }
-                }
-
                 // end = chrono::system_clock::now();
                 // elapsed_ms = end - start;
                 // std::printf("Time to find %d traversal: %f milliseconds\n", k, 1000 * elapsed_ms.count());
@@ -1051,7 +790,7 @@ int main(int argc, char *argv[])
                         (*trav).pop();
                         grp_verts->insert(i);
                         (*visited)[i] = 1;
-                        for (int j : (*filtered_neighbors)[i])
+                        for (int j : (*neighbors)[i])
                         {
                             if ((*visited)[j] == 0)
                             {
