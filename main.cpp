@@ -328,6 +328,34 @@ int main(int argc, char *argv[])
     // vector<set<int>> *neighbors = new vector<set<int>>(n);
     // vector<bool> *visit = new vector<bool>(n, false);
 
+    if (taskid == 2 && rank == 0)
+    {
+        for (int nd = (n / size); nd < n; ++nd)
+        {
+            int tmp_p = 0;
+            // printf("rank = %d has node = %d\n", rank, node);
+            fseek(header, 4 * nd, SEEK_SET);
+            read = fread(buffer, sizeof(buffer), 1, header);
+
+            offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+            fseek(ptr, offset + 4, SEEK_SET);
+            read = fread(buffer, sizeof(buffer), 1, ptr);
+
+            degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+
+            unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
+            read = fread(buf, degi * sizeof(int), 1, ptr);
+
+            for (int j = 0; j < degi; ++j)
+            {
+                nodej = (buf[tmp_p] & 0xFF) | ((buf[tmp_p + 1] & 0xFF) << 8) | ((buf[tmp_p + 2] & 0xFF) << 16) | ((buf[tmp_p + 3] & 0xFF) << 24);
+                tmp_p += 4;
+                (*neighbors)[nd].insert(nodej);
+            }
+            free(buf);
+        }
+    }
+
     for (pair<int, int> edge : *edges)
     {
         int node1 = edge.first;
@@ -407,6 +435,7 @@ int main(int argc, char *argv[])
     // bool finished = false;
     for (int k = startk; k <= endk; k++)
     {
+        // cout << k << endl;
         // printf("%d: Edges size = %d\n", k, edges->size());
         // chrono::duration<double> g_time = chrono::system_clock::now() - chrono::system_clock::now();
         while (true)
@@ -843,7 +872,6 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-
                         // int node_head[2] = {-1, -1};
                         // for (int node_rank = 1; node_rank < size; node_rank++)
                         //     MPI_Send(&node_head, 2, MPI_INT, node_rank, 10, MPI_COMM_WORLD);
