@@ -1074,6 +1074,7 @@ int main(int argc, char *argv[])
             else
             {
                 map<int, int> *head = new map<int, int>();
+                map<int, set<int>> *headohead = new map<int, set<int>>();
                 vector<vector<int>> *extr_vert = new vector<vector<int>>(size);
 
                 // set<set<int>> *connected_comps = new set<set<int>>();
@@ -1082,6 +1083,9 @@ int main(int argc, char *argv[])
                 map<int, int> *visited = new map<int, int>();
                 queue<int> *trav = new queue<int>();
                 auto it = (*edges).begin();
+                set<int> *all_heads;
+                if (rank == 0)
+                    all_heads = new set<int>();
 
                 while (true)
                 {
@@ -1105,10 +1109,13 @@ int main(int argc, char *argv[])
                             tmp_head = (*it).second;
                         (*visited)[(*it).second] = 1;
                     }
-                    if(rank == 0)
-                        printf("tmp head %d\n", tmp_head);
                     if (tmp_head == -1)
                         continue;
+
+                    if (rank == 0)
+                        all_heads->insert(tmp_head);
+
+                    printf("rank %d: tmp head %d\n", rank, tmp_head);
                     while ((*trav).size() > 0)
                     {
                         int i = (*trav).front();
@@ -1136,15 +1143,20 @@ int main(int argc, char *argv[])
                     connected_comps->insert({tmp_head, *grp_verts});
                     // connected_comps->insert(*grp_verts);
                 }
+                free(trav);
+                free(visited);
 
-                // printf("Rank %d said HI\n", rank);
+                // printf("rank %d, k %d: cc size = %d\n", rank, k, connected_comps->size());
+                for (auto x : *connected_comps)
+                    printf("rank %d, k %d: head %d, size %d\n", rank, k, x.first, x.second.size());
 
                 int num_stop = rank;
                 vector<int> *tmp_conn = new vector<int>(2 * n);
-                while (num_stop > 0)
+                while (num_stop--)
                 {
                     MPI_Status stat;
                     MPI_Recv(tmp_conn->data(), 2 * n, MPI_INT, MPI_ANY_SOURCE, 5, MPI_COMM_WORLD, &stat);
+                    printf("rank %d: received from %d\n", rank, stat.MPI_SOURCE);
                     if ((*tmp_conn)[0] != -1)
                     {
                         int cnt = 0;
@@ -1154,14 +1166,16 @@ int main(int argc, char *argv[])
                             if (head->find((*tmp_conn)[i]) == head->end())
                                 continue;
                             int hd = (*head)[(*tmp_conn)[i]];
-                            printf("head of %d is %d\n", (*tmp_conn)[i], hd);
-                            if (hd == (*tmp_conn)[i + 1])
-                                continue;
-                            (*head)[hd] = (*tmp_conn)[i + 1];
+                            printf("head of %d is %d should be %d\n", (*tmp_conn)[i], hd, (*tmp_conn)[i + 1]);
+                            // if (hd == (*tmp_conn)[i + 1])
+                            //     continue;
+                            // (*head)[hd] = (*tmp_conn)[i + 1];
+                            (*headohead)[hd].insert((*tmp_conn)[i + 1]);
                         }
                     }
-                    num_stop--;
                 }
+                free(tmp_conn);
+
                 for (int rk = rank + 1; rk < size; rk++)
                 {
                     if ((*extr_vert)[rk].size() == 0)
@@ -1177,7 +1191,7 @@ int main(int argc, char *argv[])
                     }
                 }
 
-                MPI_Barrier(MPI_COMM_WORLD);
+                // MPI_Barrier(MPI_COMM_WORLD);
                 // printf("hello2 %d\n", rank);
 
                 // printf("rank %d has size = %d for k = %d\n", rank, (int) connected_comps->size(),k);
@@ -1197,119 +1211,117 @@ int main(int argc, char *argv[])
 
                     // printf("rank 0 is here\n");
 
-                    int num_fin = 0;
-
-                    while (num_fin != size - 1)
+                    for (int rk = 1; rk < size; rk++)
                     {
-                        MPI_Status stat;
-
-                        set<int> *recv_conn_comp = new set<int>();
-
-                        int len;
-
-                        MPI_Recv(&len, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &stat);
-
-                        printf("rank 0 got1  %d\n", len);
-
-                        if (len == -1)
+                        while (true)
                         {
-                            num_fin++;
-                            printf("num_fin = %d\n", num_fin);
-                            continue;
+                            MPI_Status stat;
+                            set<int> *recv_conn_comp = new set<int>();
+                            int len;
+                            MPI_Recv(&len, 1, MPI_INT, rk, 6, MPI_COMM_WORLD, &stat);
+                            if (len == -1)
+                                break;
+                            int vec[len];
+                            MPI_Recv(vec, len, MPI_INT, rk, 7, MPI_COMM_WORLD, &stat);
+
+                            // int flag = 0;
+                            // printf("Receive head of %d is %d\n", vec[1], vec[0]);
+                            // printf("rank 0 got head %d from rank %d : %d\n", hd, stat.MPI_SOURCE, (*head)[hd]);
+
+                            for (int id = 1; id < vec[0]; id++)
+                            {
+                                all_heads->insert(vec[id]);
+                                (*headohead)[vec[vec[0]]].insert(vec[id]);
+                                (*headohead)[vec[vec[id]]].insert(vec[0]);
+                            }
+                            all_heads->insert(vec[1]);
+                            for (int ind = vec[0]; ind < len; ind++)
+                            {
+                                (*connected_comps)[vec[vec[0]]].insert(vec[ind]);
+                                // printf("hd = %d, vert = %d", vec[vec[0]], vec[ind]);
+                            }
+
+                            // if (head->find(vec[0]) == head->end())
+                            //     (*head)[vec[0]] = vec[0];
+                            // (*head)[vec[1]] = (*head)[vec[0]];
+                            // int hd = (*head)[vec[0]];
+                            // for (int ind = 1; ind < len; ind++)
+                            //     (*connected_comps)[hd].insert(vec[ind]);
+                            // for (auto x : (*connected_comps))
+                            // printf("head = %d\n", x.first);
                         }
-                        int vec[len];
-                        MPI_Recv(vec, len, MPI_INT, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &stat);
-
-                        printf("rank 0 got2 %d\n", len);
-
-                        int flag = 0;
-
-                        int hd = vec[0];
-                        printf("rank 0 got head %d from rank %d : %d\n", hd, stat.MPI_SOURCE, (*head)[hd]);
-
-                        while ((*head)[hd] != hd)
-                            hd = (*head)[hd];
-                        (*head)[vec[0]] = hd;
-                        (*head)[vec[1]] = hd;
-
-                        for (int ind = 1; ind < len; ind++)
-                            (*connected_comps)[hd].insert(vec[ind]);
-
-                        for (auto x : (*connected_comps))
-                            printf("head = %d\n", x.first);
-
-                        // set<set<int>> comps_to_be_del;
-                        // set<int> comp_fin;
-                        // set<int> visited;
-                        // for (int in = 0; in < len; ++in)
-                        // {
-                        //     int v = vec[in];
-                        //     if (mp_rep.find(v) != mp_rep.end())
-                        //     {
-                        //         flag++;
-                        //         auto comp = mp_comp[mp_rep[v]];
-
-                        //         if (visited.find(mp_rep[v]) == visited.end())
-                        //         {
-                        //             comps_to_be_del.insert(comp);
-                        //             comp_fin.insert(comp.begin(), comp.end());
-                        //             visited.insert(mp_rep[v]);
-                        //         }
-                        //     }
-                        // }
-                        // // printf("%d\n", flag);
-                        // if (flag != 0)
-                        // {
-                        //     for (int in = 0; in < len; ++in)
-                        //     {
-                        //         comp_fin.insert(vec[in]);
-                        //     }
-                        //     for (auto comp : comps_to_be_del)
-                        //     {
-                        //         connected_comps->erase(comp);
-                        //     }
-                        //     connected_comps->insert(comp_fin);
-                        //     for (auto v : comp_fin)
-                        //     {
-                        //         mp_rep[v] = rep;
-                        //     }
-                        //     mp_comp[rep] = comp_fin;
-                        //     rep++;
-                        // }
-                        // else
-                        // {
-                        //     set<int> recv_conn_comp;
-                        //     for (int in = 0; in < len; ++in)
-                        //     {
-                        //         int v = vec[in];
-                        //         mp_rep[v] = rep;
-                        //         recv_conn_comp.insert(v);
-                        //     }
-                        //     mp_comp[rep] = recv_conn_comp;
-                        //     rep++;
-                        //     connected_comps->insert(recv_conn_comp);
-                        // }
-                        // printf("%d\n", connected_comps->size());
                     }
+
+                    printf("Finished stage!\n");
+
+                    set<set<int>> *head_comps = new set<set<int>>();
+                    map<int, int> *visited = new map<int, int>();
+                    queue<int> *trav = new queue<int>();
+                    auto it = all_heads->begin();
+
+                    while (true)
+                    {
+                        while (it != all_heads->end() && (*visited)[*it] == 1)
+                            it++;
+                        if (it == all_heads->end())
+                            break;
+
+                        set<int> *grp_heads = new set<int>();
+                        trav->push(*it);
+                        (*visited)[*it] = 1;
+                        // printf("rank %d: tmp head %d\n", rank, tmp_head);
+                        while ((*trav).size() > 0)
+                        {
+                            int i = (*trav).front();
+                            (*trav).pop();
+                            grp_heads->insert(i);
+                            (*visited)[i] = 1;
+
+                            for (int j : (*headohead)[i])
+                            {
+                                if ((*visited)[j] == 0)
+                                {
+                                    trav->push(j);
+                                    (*visited)[j] = 1;
+                                }
+                            }
+                        }
+                        head_comps->insert(*grp_heads);
+                    }
+                    free(visited);
+                    free(trav);
+
+                    map<int, int> *vis = new map<int, int>();
+
                     // printf("%d\n", connected_comps->size());
-                    if ((*connected_comps).size() == 0)
+                    if ((*head_comps).size() == 0)
                         fout << 0 << endl;
                     else
                     {
                         fout << 1 << endl;
                         if (verbose == 1)
                         {
-                            fout << (int)(*connected_comps).size() << endl;
-                            for (auto grp : (*connected_comps))
+                            fout << (int)(*head_comps).size() << endl;
+                            for (auto grp : (*head_comps))
                             {
-                                int i = 0;
-                                for (int v : grp.second)
+                                printf("k : %d, head grp: ", k);
+                                for (int hd : grp)
                                 {
-                                    fout << v;
-                                    if (i++ < (int)grp.second.size() - 1)
-                                        fout << " ";
+                                    printf("%d ", hd);
+                                    int sz = (*connected_comps)[hd].size() - 1;
+                                    for (int v : (*connected_comps)[hd])
+                                    {
+                                        if ((*vis)[v] != 1)
+                                        {
+                                            fout << v;
+                                            if (sz)
+                                                fout << " ";
+                                        }
+                                        sz--;
+                                    }
                                 }
-                                fout << endl;
+                                printf("\n");
+                                fout << "\n";
                             }
                         }
                     }
@@ -1318,18 +1330,64 @@ int main(int argc, char *argv[])
                 {
                     for (auto comp : *connected_comps)
                     {
-                        vector<int> tmp(comp.second.size() + 1);
-                        int index = 0;
-                        tmp[index++] = (*head)[comp.first];
-                        for (auto v : comp.second)
-                            tmp[index++] = v;
-                        MPI_Ssend(&index, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-                        // printf("rank = %d sent %d size\n", rank, index);
-                        MPI_Ssend(tmp.data(), (int)comp.second.size() + 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
-                        // printf("rank = %d sent %d size\n", rank, (int)comp.size());
+                        auto it = comp.second.begin();
+                        it++;
+                        int hdsz = (*headohead)[comp.first].size() + 1;
+                        int donesz = 0;
+                        bool proceed = true;
+                        while (proceed)
+                        {
+                            int tmpsz = 1000;
+                            if (comp.second.size() + hdsz - donesz <= 1000)
+                            {
+                                proceed = false;
+                                tmpsz = comp.second.size() + hdsz - donesz;
+                            }
+                            donesz += tmpsz;
+                            vector<int>* tmp = new vector<int>(tmpsz);
+                            int index = 0;
+                            (*tmp)[index++] = hdsz;
+                            for (auto x : (*headohead)[comp.first])
+                                (*tmp)[index++] = x;
+                            (*tmp)[index++] = comp.first;
+                            printf("1 size of %d is %d\n", comp.first, index);
+                            for (; it != comp.second.end() && index < tmpsz; it++)
+                                (*tmp)[index++] = *it;
+                            // cout << "\n";
+                            printf("1 size of %d is %d\n", comp.first, tmpsz);
+                            MPI_Send(&index, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
+                            printf("2 size of %d is %d\n", comp.first, tmp->size());
+                            // printf("rank = %d sent %d size\n", rank, index);
+                            // MPI_Buffer_attach(tmp.data(), index * sizeof(int));
+                            MPI_Send(tmp->data(), index, MPI_INT, 0, 7, MPI_COMM_WORLD);
+                            printf("3 size of %d is %d\n", comp.first, index);
+                            // printf("rank = %d sent %d size\n", rank, (int)comp.size());
+                        }
                     }
+
+
+                //     for (auto comp : *connected_comps)
+                //     {
+                //         int hdsz = (*headohead)[comp.first].size() + 1;
+                //         vector<int> tmp(comp.second.size() + hdsz);
+                //         int index = 0;
+                //         tmp[index++] = hdsz;
+                //         for (auto x : (*headohead)[comp.first])
+                //             tmp[index++] = x;
+                //         printf("1 size of %d is %d\n", comp.first, index);
+                //         printf("1 size of %d is %d\n", comp.first, index + (int)comp.second.size());
+                //         for (auto v : comp.second)
+                //             tmp[index++] = v;
+                //         MPI_Send(&index, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
+                //         printf("2 size of %d is %d\n", comp.first, index);
+                //         // printf("rank = %d sent %d size\n", rank, index);
+                //         // MPI_Buffer_attach(tmp.data(), index * sizeof(int));
+                //         MPI_Send(tmp.data(), index, MPI_INT, 0, 7, MPI_COMM_WORLD);
+                //         printf("3 size of %d is %d\n", comp.first, index);
+                //         // printf("rank = %d sent %d size\n", rank, (int)comp.size());
+                //     }
                     int c = -1;
-                    MPI_Ssend(&c, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+                    MPI_Send(&c, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
                     // printf("rank = %d sent -1\n", rank);
                 }
 
@@ -1376,6 +1434,8 @@ int main(int argc, char *argv[])
                 //     }
                 //     connected_comps->insert(*grp_verts);
                 // }
+
+                // printf("rank %d, k %d: cc size = %d\n", rank, k, connected_comps->size());
 
                 // MPI_Barrier(MPI_COMM_WORLD);
                 // printf("hello2 %d\n", rank);

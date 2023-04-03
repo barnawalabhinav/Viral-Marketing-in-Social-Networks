@@ -4,7 +4,7 @@
 SEQCC=g++
 MPICC=mpiCC
 MPIRUN=mpirun -np 4
-CFLAGS=-std=c++11 -Wall -O3 -fopenmp
+CFLAGS=-std=c++17 -Wall -O3 -fopenmp
 MPI_MAIN=main.cpp
 SEQ_MAIN=ap_seq.cpp
 
@@ -305,27 +305,27 @@ verify.o: verify.cpp
 	$(SEQCC) $(CFLAGS) verify.cpp -o verify.o
 
 check0: verify.o
-	./verify.o test0/test-output-0.txt test0/output0_verbose.txt
+	./verify.o A2/test0/test-output-0.txt A2/test0/output0_verbose.txt
 check1: verify.o
-	./verify.o test1/test-output-1.txt test1/output1_verbose.txt
+	./verify.o A2/test1/test-output-1.txt A2/test1/output1_verbose.txt
 check2: verify.o
-	./verify.o test2/test-output-2.txt test2/output2_verbose.txt
+	./verify.o A2/test2/test-output-2.txt A2/test2/output2_verbose.txt
 check3: verify.o
-	./verify.o test3/test-output-3.txt test3/output3_verbose.txt
+	./verify.o A2/test3/test-output-3.txt A2/test3/output3_verbose.txt
 check4: verify.o
-	./verify.o test4/test-output-4.txt test4/output4_verbose.txt
+	./verify.o A2/test4/test-output-4.txt A2/test4/output4_verbose.txt
 check5: verify.o
-	./verify.o test5/test-output-5.txt test5/output5_verbose.txt
+	./verify.o A2/test5/test-output-5.txt A2/test5/output5_verbose.txt
 check6: verify.o
-	./verify.o test6/test-output-6.txt test6/output6_verbose.txt
+	./verify.o A2/test6/test-output-6.txt A2/test6/output6_verbose.txt
 check7: verify.o
-	./verify.o test7/test-output-7.txt test7/output7_verbose.txt
+	./verify.o A2/test7/test-output-7.txt A2/test7/output7_verbose.txt
 check8: verify.o
-	./verify.o test8/test-output-8.txt test8/output8_verbose.txt
+	./verify.o A2/test8/test-output-8.txt A2/test8/output8_verbose.txt
 check9: verify.o
-	./verify.o test9/test-output-9.txt test9/output9_verbose.txt
+	./verify.o A2/test9/test-output-9.txt A2/test9/output9_verbose.txt
 check10: verify.o
-	./verify.o test10/test-output-10.txt test10/output10_verbose.txt
+	./verify.o A2/test10/test-output-10.txt A2/test10/output10_verbose.txt
 
 check311: verify.o
 	./verify.o A3/test1/task1-output-1.txt A3/test1/task1_output1_verbose.txt
