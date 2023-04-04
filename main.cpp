@@ -1232,7 +1232,7 @@ int main(int argc, char *argv[])
                             {
                                 all_heads->insert(vec[id]);
                                 (*headohead)[vec[vec[0]]].insert(vec[id]);
-                                (*headohead)[vec[vec[id]]].insert(vec[0]);
+                                (*headohead)[vec[id]].insert(vec[vec[0]]);
                             }
                             all_heads->insert(vec[1]);
                             for (int ind = vec[0]; ind < len; ind++)
@@ -1314,8 +1314,8 @@ int main(int argc, char *argv[])
                                         if ((*vis)[v] != 1)
                                         {
                                             fout << v;
-                                            if (sz)
-                                                fout << " ";
+                                            (*vis)[v] = 1;
+                                            fout << " ";
                                         }
                                         sz--;
                                     }
