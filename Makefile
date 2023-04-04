@@ -258,7 +258,8 @@ mpi_run324: mpi_exec
 	$(MPIRUN) a3 $(ARGS324)
 
 
-# mpi_run_old: mpi_run-2 mpi_run-1 mpi_run0 mpi_run1 mpi_run2 mpi_run3 mpi_run4 mpi_run5 mpi_run6 mpi_run7 mpi_run8 mpi_run9 mpi_run10
+mpi_run2: mpi_run-2 mpi_run-1 mpi_run0 mpi_run1 mpi_run2 mpi_run3 mpi_run4 mpi_run5
+# mpi_run6 mpi_run7 mpi_run8 mpi_run9 mpi_run10
 mpi_run31: mpi_run311 mpi_run312 mpi_run313 mpi_run314
 mpi_run32: mpi_run321 mpi_run322 mpi_run323 mpi_run324
 
@@ -346,7 +347,8 @@ check324: verify.o
 	./verify.o A3/test4/task2-output-4.txt A3/test4/task2_output4_verbose.txt
 
 
-check_old: check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10
+check21: check0 check1 check2 check3 check4 check5
+# check6 check7 check8 check9 check10
 check31: check311 check312 check313 check314
 check32: check321 check322 check323 check324
 
