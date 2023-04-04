@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
                 tmp_p += 4;
                 (*neighbors)[nd].insert(nodej);
             }
-            free(buf);
+            std::free(buf);
         }
     }
     // ************ FOR INFLUENCER COMPUTATION ************/
@@ -640,8 +640,8 @@ int main(int argc, char *argv[])
                     }
                     connected_comps->insert({tmp_head, *grp_verts});
                 }
-                free(trav);
-                free(visited);
+                std::free(trav);
+                std::free(visited);
 
                 int num_stop = rank;
                 vector<int> *tmp_conn = new vector<int>(2 * n);
@@ -662,7 +662,7 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
-                free(tmp_conn);
+                std::free(tmp_conn);
 
                 for (int rk = rank + 1; rk < size; rk++)
                 {
@@ -744,8 +744,8 @@ int main(int argc, char *argv[])
                         }
                         head_comps->insert(*grp_heads);
                     }
-                    free(visited);
-                    free(trav);
+                    std::free(visited);
+                    std::free(trav);
 
                     if (taskid == 1)
                     {
@@ -772,7 +772,7 @@ int main(int argc, char *argv[])
                                 fout << "\n";
                             }
                         }
-                        free(vis);
+                        std::free(vis);
                     }
                     else
                     {
@@ -823,7 +823,7 @@ int main(int argc, char *argv[])
                                                         (*vis)[v] = 1;
                                                     }
                                     fout << "\n";
-                                    free(vis);
+                                    std::free(vis);
                                 }
                             }
                         }
