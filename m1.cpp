@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
             for (int i = rank * (n / size); i < (rank + 1) * (n / size); ++i)
             {
                 int index_tid = i - ((rank) * (n / size));
-                
-                if (index_tid >= tid * ((n / size) / size_threads) && index_tid < (tid == size_threads-1 ? (n/size):((tid + 1) * ((n / size) / size_threads))))
+
+                if (index_tid >= tid * ((n / size) / size_threads) && index_tid < (tid == size_threads - 1 ? (n / size) : ((tid + 1) * ((n / size) / size_threads))))
                 {
                     int node = i, p = 0;
                     fseek(header, 4 * node, SEEK_SET);
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
             for (int i = rank * (n / size); i < n; ++i)
             {
                 int index_tid = i - ((rank) * (n / size));
-                if (index_tid >= tid * ((num_verts) / size_threads) && index_tid < (tid == size_threads-1 ? (num_verts):((tid + 1) * ((num_verts) / size_threads))))
+                if (index_tid >= tid * ((num_verts) / size_threads) && index_tid < (tid == size_threads - 1 ? (num_verts) : ((tid + 1) * ((num_verts) / size_threads))))
                 {
                     int node = i, p = 0;
                     fseek(header, 4 * node, SEEK_SET);
@@ -230,7 +230,8 @@ int main(int argc, char *argv[])
         {
         }
         // ************ FOR INFLUENCER COMPUTATION ************/
-
+        
+        printf("tid = %d, size = %d\n", tid, (int)edges.size());
         for (pair<int, int> edge : edges)
         {
             int node1 = edge.first;
@@ -312,7 +313,6 @@ int main(int argc, char *argv[])
                     int j = e.second;
                     if ((int)(triangles.at({i, j})).size() < k)
                     {
-// mutex
 #pragma omp critical
                         {
                             all_deletable.push_back(i);
@@ -323,7 +323,9 @@ int main(int argc, char *argv[])
                     else
                         it++;
                 }
+
 #pragma omp barrier
+printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable.size(),k,edges.size());
                 int totalcount;
                 if (tid == 0)
                 {
@@ -362,11 +364,8 @@ int main(int argc, char *argv[])
                 for (int t = 0; t < totalcount; t += 2)
                 {
                     int i, j;
-#pragma omp critical
-                    {
-                        i = (recvbuf)[t];
-                        j = (recvbuf)[t + 1];
-                    }
+                    i = (recvbuf)[t];
+                    j = (recvbuf)[t + 1];
                     for (int p : (triangles)[{i, j}])
                     {
                         int w = min(i, p);
@@ -424,7 +423,8 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    if (((int)(edges).size()) >= 1){
+                    if (((int)(edges).size()) >= 1)
+                    {
 #pragma omp atomic write
                         if_present = 1;
                     }
