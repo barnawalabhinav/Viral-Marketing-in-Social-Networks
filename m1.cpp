@@ -337,21 +337,20 @@ int main(int argc, char *argv[])
                             break;
                         }
                     }
-                    if (!proceed)
+                    if (proceed)
                     {
-                        break;
+
+                        displs[0] = 0;
+                        for (int i = 1; i < size; i++)
+                            displs[i] = displs[i - 1] + recvcounts[i - 1];
+
+                        totalcount = displs[size - 1] + recvcounts[size - 1];
+
+                        recvbuf = vector<int>(totalcount);
+                        MPI_Allgatherv(all_deletable.data(), sendcount, MPI_INT, recvbuf.data(), recvcounts, displs, MPI_INT, MPI_COMM_WORLD);
+
+                        all_deletable.clear();
                     }
-
-                    displs[0] = 0;
-                    for (int i = 1; i < size; i++)
-                        displs[i] = displs[i - 1] + recvcounts[i - 1];
-
-                    totalcount = displs[size - 1] + recvcounts[size - 1];
-
-                    recvbuf = vector<int>(totalcount);
-                    MPI_Allgatherv(all_deletable.data(), sendcount, MPI_INT, recvbuf.data(), recvcounts, displs, MPI_INT, MPI_COMM_WORLD);
-
-                    all_deletable.clear();
                 }
 
 #pragma omp barrier
@@ -385,7 +384,7 @@ int main(int argc, char *argv[])
             }
 
 #pragma omp barrier
-            //printf("tid = %d, k = %d\n", tid, k);
+            // printf("tid = %d, k = %d\n", tid, k);
             if (taskid == 1 && verbose == 0)
             {
                 if (tid == 0)
@@ -395,18 +394,23 @@ int main(int argc, char *argv[])
 #pragma omp barrier
                 if (rank == 0)
                 {
-
+                    if (tid == 0)
+                    {
+                        if_present = 0;
+                    }
+#pragma omp barrier
                     for (int i = 0; i < NUM_THREADS; ++i)
                     {
                         if (tid == i)
                         {
                             if (((int)(edges).size()) >= 1)
-#pragma omp atomic write
+                            {
                                 if_present = 1;
+                            }
                         }
                     }
 #pragma omp barrier
-                    printf("%d, k= %d\n", if_present, k);
+                    printf("%d, k= %d, rank = %d\n", if_present, k, rank);
                     if (tid == 0)
                     {
                         recvcounts = (int *)malloc(size * sizeof(int));
@@ -448,7 +452,7 @@ int main(int argc, char *argv[])
             {
             }
 #pragma omp barrier
-printf("tid = %d, here, k = %d, rank = %d\n", tid, k, rank);
+            printf("tid = %d, here, k = %d, rank = %d\n", tid, k, rank);
         }
         printf("tid = %d, out of loop\n", tid);
         if (rank == 0)
