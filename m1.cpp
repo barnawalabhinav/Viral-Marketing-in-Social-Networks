@@ -99,6 +99,9 @@ int main(int argc, char *argv[])
     int size_threads = NUM_THREADS;
     int if_present = 0;
     bool proceed = false;
+    int totalcount;
+
+    ofstream fout(outputpath, ios::out);
 
     vector<int> all_deletable;
     vector<int> recvbuf;
@@ -230,7 +233,7 @@ int main(int argc, char *argv[])
         {
         }
         // ************ FOR INFLUENCER COMPUTATION ************/
-        
+
         printf("tid = %d, size = %d\n", tid, (int)edges.size());
         for (pair<int, int> edge : edges)
         {
@@ -295,8 +298,6 @@ int main(int argc, char *argv[])
                 }
         }
 
-        ofstream fout(outputpath, ios::out);
-
         for (int k = startk; k <= endk; k++)
         {
             if (tid == 0)
@@ -325,8 +326,7 @@ int main(int argc, char *argv[])
                 }
 
 #pragma omp barrier
-printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable.size(),k,edges.size());
-                int totalcount;
+                printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable.size(), k, edges.size());
                 if (tid == 0)
                 {
                     int sendcount = (int)all_deletable.size(), recvcounts[size], displs[size];
@@ -408,6 +408,7 @@ printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable
                         int flag = 0;
                         for (int i = 0; i < size; ++i)
                         {
+                            printf("Hi : %d ", recvcounts[i]);
                             if (recvcounts[i] == 1)
                             {
                                 fout << 1 << endl;
@@ -415,6 +416,7 @@ printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable
                                 break;
                             }
                         }
+                        printf("\n");
                         if (flag == 0)
                         {
                             fout << 0 << endl;
