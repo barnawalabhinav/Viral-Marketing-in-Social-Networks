@@ -11,7 +11,7 @@ typedef long long ll;
 
 #define deg(i) neighbors[i].size()
 #define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
-#define NUM_THREADS 2
+#define NUM_THREADS 4
 
 int get_edge_rank(int i, int j, int n, int size)
 {
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
         }
         // ************ FOR INFLUENCER COMPUTATION ************/
 
-        printf("tid = %d, size = %d\n", tid, (int)edges.size());
+        //printf("tid = %d, size = %d\n", tid, (int)edges.size());
         for (pair<int, int> edge : edges)
         {
             int node1 = edge.first;
@@ -303,7 +303,6 @@ int main(int argc, char *argv[])
             if (tid == 0)
                 if_present = 0;
 
-#pragma omp barrier
             while (true)
             {
                 auto it = (edges).begin();
@@ -326,7 +325,7 @@ int main(int argc, char *argv[])
                 }
 
 #pragma omp barrier
-                printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable.size(), k, edges.size());
+                //printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable.size(), k, edges.size());
                 if (tid == 0)
                 {
                     int sendcount = (int)all_deletable.size(), recvcounts[size], displs[size];
@@ -387,11 +386,6 @@ int main(int argc, char *argv[])
             // printf("tid = %d, k = %d\n", tid, k);
             if (taskid == 1 && verbose == 0)
             {
-                if (tid == 0)
-                {
-                    recvcounts = NULL;
-                }
-#pragma omp barrier
                 if (rank == 0)
                 {
                     if (((int)(edges).size()) >= 1)
@@ -400,7 +394,7 @@ int main(int argc, char *argv[])
                         if_present = 1;
                     }
 #pragma omp barrier
-                    printf("%d, k= %d, rank = %d\n", if_present, k, rank);
+                    //printf("%d, k= %d, rank = %d\n", if_present, k, rank);
                     if (tid == 0)
                     {
                         recvcounts = (int *)malloc(size * sizeof(int));
@@ -408,7 +402,7 @@ int main(int argc, char *argv[])
                         int flag = 0;
                         for (int i = 0; i < size; ++i)
                         {
-                            printf("Hi : %d ", recvcounts[i]);
+                            //printf("Hi : %d ", recvcounts[i]);
                             if (recvcounts[i] == 1)
                             {
                                 fout << 1 << endl;
@@ -416,7 +410,7 @@ int main(int argc, char *argv[])
                                 break;
                             }
                         }
-                        printf("\n");
+                        //printf("\n");
                         if (flag == 0)
                         {
                             fout << 0 << endl;
@@ -439,9 +433,9 @@ int main(int argc, char *argv[])
             {
             }
 #pragma omp barrier
-            printf("tid = %d, here, k = %d, rank = %d\n", tid, k, rank);
+            //printf("tid = %d, here, k = %d, rank = %d\n", tid, k, rank);
         }
-        printf("tid = %d, out of loop\n", tid);
+        //printf("tid = %d, out of loop\n", tid);
         if (rank == 0)
         {
             if (tid == 0)
@@ -452,7 +446,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                cout << "tid = " << tid << '\n';
+               // cout << "tid = " << tid << '\n';
             }
         }
     }
