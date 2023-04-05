@@ -11,7 +11,7 @@ typedef long long ll;
 
 #define deg(i) neighbors[i].size()
 #define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
-#define NUM_THREADS 4
+#define NUM_THREADS 2
 
 int get_edge_rank(int i, int j, int n, int size)
 {
@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
         read = fread(buffer, sizeof(buffer), 1, ptr); // read 8 bytes to our buffer
         int m = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
 
-        set<pair<int, int>> *edges = new set<pair<int, int>>();
-        vector<set<int>> *neighbors = new vector<set<int>>(n);
-        vector<set<int>> *filtered_neighbors = new vector<set<int>>(n);
+        set<pair<int, int>> edges;
+        vector<set<int>> neighbors(n);
+        vector<set<int>> filtered_neighbors(n);
 
         int degi, node, p, offset, flag, node_bufj, nodej;
 
@@ -131,7 +131,8 @@ int main(int argc, char *argv[])
             for (int i = rank * (n / size); i < (rank + 1) * (n / size); ++i)
             {
                 int index_tid = i - ((rank) * (n / size));
-                if (index_tid >= tid * ((n / size) / size_threads) && index_tid < (tid + 1) * ((n / size) / size_threads))
+                
+                if (index_tid >= tid * ((n / size) / size_threads) && index_tid < (tid == size_threads-1 ? (n/size):((tid + 1) * ((n / size) / size_threads))))
                 {
                     int node = i, p = 0;
                     fseek(header, 4 * node, SEEK_SET);
@@ -150,24 +151,24 @@ int main(int argc, char *argv[])
                     {
                         nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                         p += 4;
-                        (*neighbors)[node].insert(nodej);
-                        (*filtered_neighbors)[node].insert(nodej);
+                        (neighbors)[node].insert(nodej);
+                        (filtered_neighbors)[node].insert(nodej);
 
                         // Assign edges to even and smaller (if both even) and larger (if both odd) nodes only
                         if (node & 1)
                         {
                             if ((nodej & 1) && (node > nodej))
-                                edges->insert({nodej, node});
+                                edges.insert({nodej, node});
                         }
                         else
                         {
                             if (nodej & 1)
                                 if (node < nodej)
-                                    edges->insert({node, nodej});
+                                    edges.insert({node, nodej});
                                 else
-                                    edges->insert({nodej, node});
+                                    edges.insert({nodej, node});
                             else if (node < nodej)
-                                edges->insert({node, nodej});
+                                edges.insert({node, nodej});
                         }
                     }
                     std::free(buf);
@@ -180,7 +181,7 @@ int main(int argc, char *argv[])
             for (int i = rank * (n / size); i < n; ++i)
             {
                 int index_tid = i - ((rank) * (n / size));
-                if (index_tid >= tid * ((num_verts) / size_threads) && index_tid < num_verts)
+                if (index_tid >= tid * ((num_verts) / size_threads) && index_tid < (tid == size_threads-1 ? (num_verts):((tid + 1) * ((num_verts) / size_threads))))
                 {
                     int node = i, p = 0;
                     fseek(header, 4 * node, SEEK_SET);
@@ -199,22 +200,22 @@ int main(int argc, char *argv[])
                     {
                         nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                         p += 4;
-                        (*neighbors)[node].insert(nodej);
-                        (*filtered_neighbors)[node].insert(nodej);
+                        (neighbors)[node].insert(nodej);
+                        (filtered_neighbors)[node].insert(nodej);
                         if (node & 1)
                         {
                             if ((nodej & 1) && (node > nodej))
-                                edges->insert({nodej, node});
+                                edges.insert({nodej, node});
                         }
                         else
                         {
                             if (nodej & 1)
                                 if (node < nodej)
-                                    edges->insert({node, nodej});
+                                    edges.insert({node, nodej});
                                 else
-                                    edges->insert({nodej, node});
+                                    edges.insert({nodej, node});
                             else if (node < nodej)
-                                edges->insert({node, nodej});
+                                edges.insert({node, nodej});
                         }
                     }
                     std::free(buf);
@@ -230,7 +231,7 @@ int main(int argc, char *argv[])
         }
         // ************ FOR INFLUENCER COMPUTATION ************/
 
-        for (pair<int, int> edge : *edges)
+        for (pair<int, int> edge : edges)
         {
             int node1 = edge.first;
             int node2 = edge.second;
@@ -259,8 +260,8 @@ int main(int argc, char *argv[])
                     {
                         nodej = (buf[p] & 0xFF) | ((buf[p + 1] & 0xFF) << 8) | ((buf[p + 2] & 0xFF) << 16) | ((buf[p + 3] & 0xFF) << 24);
                         p += 4;
-                        (*neighbors)[nd].insert(nodej);
-                        (*filtered_neighbors)[nd].insert(nodej);
+                        (neighbors)[nd].insert(nodej);
+                        (filtered_neighbors)[nd].insert(nodej);
                     }
                     std::free(buf);
                 }
@@ -270,26 +271,26 @@ int main(int argc, char *argv[])
         std::fclose(ptr);
         std::fclose(header);
 
-        map<pair<int, int>, set<int>> *triangles = new map<pair<int,int>, set<int>>();
+        map<pair<int, int>, set<int>> triangles;
 
-        for (pair<int, int> e : *edges)
+        for (pair<int, int> e : edges)
         {
             int i = e.first;
             int j = e.second;
-            triangles->insert({{i, j}, set<int>()});
-            for (int k : (*neighbors)[j])
-                if ((*neighbors)[i].find(k) != (*neighbors)[i].end())
+            triangles.insert({{i, j}, set<int>()});
+            for (int k : (neighbors)[j])
+                if ((neighbors)[i].find(k) != (neighbors)[i].end())
                 {
-                    triangles->at({i, j}).insert(k);
+                    triangles.at({i, j}).insert(k);
                     if (i < k)
-                        (*triangles)[{i, k}].insert(j);
+                        (triangles)[{i, k}].insert(j);
                     else
-                        (*triangles)[{k, i}].insert(j);
+                        (triangles)[{k, i}].insert(j);
 
                     if (j < k)
-                        (*triangles)[{j, k}].insert(i);
+                        (triangles)[{j, k}].insert(i);
                     else
-                        (*triangles)[{k, j}].insert(i);
+                        (triangles)[{k, j}].insert(i);
                 }
         }
 
@@ -303,13 +304,13 @@ int main(int argc, char *argv[])
 #pragma omp barrier
             while (true)
             {
-                auto it = (*edges).begin();
-                while (it != edges->end())
+                auto it = (edges).begin();
+                while (it != edges.end())
                 {
                     pair<int, int> e = *it;
                     int i = e.first;
                     int j = e.second;
-                    if ((int)(triangles->at({i, j})).size() < k)
+                    if ((int)(triangles.at({i, j})).size() < k)
                     {
 // mutex
 #pragma omp critical
@@ -317,7 +318,7 @@ int main(int argc, char *argv[])
                             all_deletable.push_back(i);
                             all_deletable.push_back(j);
                         }
-                        it = edges->erase(it);
+                        it = edges.erase(it);
                     }
                     else
                         it++;
@@ -366,20 +367,20 @@ int main(int argc, char *argv[])
                         i = (recvbuf)[t];
                         j = (recvbuf)[t + 1];
                     }
-                    for (int p : (*triangles)[{i, j}])
+                    for (int p : (triangles)[{i, j}])
                     {
                         int w = min(i, p);
                         int x = max(i, p);
                         int y = min(j, p);
                         int z = max(j, p);
-                        if ((*triangles)[{w, x}].find(j) != (*triangles)[{w, x}].end())
-                            (*triangles)[{w, x}].erase(j);
-                        if ((*triangles)[{y, z}].find(i) != (*triangles)[{y, z}].end())
-                            (*triangles)[{y, z}].erase(i);
+                        if ((triangles)[{w, x}].find(j) != (triangles)[{w, x}].end())
+                            (triangles)[{w, x}].erase(j);
+                        if ((triangles)[{y, z}].find(i) != (triangles)[{y, z}].end())
+                            (triangles)[{y, z}].erase(i);
                     }
 
-                    (*filtered_neighbors)[i].erase(j);
-                    (*filtered_neighbors)[j].erase(i);
+                    (filtered_neighbors)[i].erase(j);
+                    (filtered_neighbors)[j].erase(i);
                 }
             }
 
@@ -394,7 +395,7 @@ int main(int argc, char *argv[])
 #pragma omp barrier
                 if (rank == 0)
                 {
-                    if (((int)(*edges).size()) >= 1)
+                    if (((int)(edges).size()) >= 1)
                     {
 #pragma omp atomic write
                         if_present = 1;
@@ -423,7 +424,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    if (((int)(*edges).size()) >= 1){
+                    if (((int)(edges).size()) >= 1){
 #pragma omp atomic write
                         if_present = 1;
                     }
