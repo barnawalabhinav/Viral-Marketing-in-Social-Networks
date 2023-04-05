@@ -394,20 +394,10 @@ int main(int argc, char *argv[])
 #pragma omp barrier
                 if (rank == 0)
                 {
-                    if (tid == 0)
+                    if (((int)(edges).size()) >= 1)
                     {
-                        if_present = 0;
-                    }
-#pragma omp barrier
-                    for (int i = 0; i < NUM_THREADS; ++i)
-                    {
-                        if (tid == i)
-                        {
-                            if (((int)(edges).size()) >= 1)
-                            {
-                                if_present = 1;
-                            }
-                        }
+#pragma omp atomic write
+                        if_present = 1;
                     }
 #pragma omp barrier
                     printf("%d, k= %d, rank = %d\n", if_present, k, rank);
@@ -434,14 +424,9 @@ int main(int argc, char *argv[])
                 else
                 {
 
-                    for (int i = 0; i < NUM_THREADS; ++i)
-                    {
-                        if (tid == i)
-                        {
-                            if (((int)(edges).size()) >= 1)
+                    if (((int)(edges).size()) >= 1){
 #pragma omp atomic write
-                                if_present = 1;
-                        }
+                        if_present = 1;
                     }
 #pragma omp barrier
                     if (tid == 0)
