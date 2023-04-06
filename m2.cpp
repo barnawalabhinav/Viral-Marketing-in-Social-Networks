@@ -441,7 +441,6 @@ int main(int argc, char *argv[])
                         int flag = 0;
                         for (int i = 0; i < size; ++i)
                         {
-                            // printf("Hi : %d ", recvcounts[i]);
                             if (recvcounts[i] == 1)
                             {
                                 fout << 1 << endl;
@@ -449,7 +448,6 @@ int main(int argc, char *argv[])
                                 break;
                             }
                         }
-                        // printf("\n");
                         if (flag == 0)
                         {
                             fout << 0 << endl;
@@ -482,10 +480,8 @@ int main(int argc, char *argv[])
 #pragma omp critical
                     {
                         all_edges.insert(e);
-                        // cout << e.first << " " << e.second << endl;
                     }
                 }
-                // cout << "----------------- k = " << k << endl;
                 for (int i = 0; i < n; i++)
                 {
                     for (int j : (filtered_neighbors)[i])
@@ -493,12 +489,10 @@ int main(int argc, char *argv[])
 #pragma omp critical
                         {
                             all_filtered[i].insert(j);
-                            // cout << i << " " << j << "\n";
                         }
                     }
                 }
 #pragma omp barrier
-                // printf("HI!\n");
                 if (tid == 0)
                 {
                     vector<int> head(n, -1);
@@ -509,7 +503,6 @@ int main(int argc, char *argv[])
                     queue<int> trav;
                     auto it = all_edges.begin();
                     set<int> all_heads;
-                    // printf("STARTED BFS\n");
 
                     while (true)
                     {
@@ -565,7 +558,6 @@ int main(int argc, char *argv[])
                         }
                         connected_comps.insert({tmp_head, grp_verts});
                     }
-                    // printf("Rank %d: \n\nFINISHED BFS\n", rank);
 
                     int num_stop = rank;
                     vector<int> tmp_conn(2 * n);
@@ -785,9 +777,7 @@ int main(int argc, char *argv[])
                 }
             }
 #pragma omp barrier
-            // printf("tid = %d, here, k = %d, rank = %d\n", tid, k, rank);
         }
-        // printf("tid = %d, out of loop\n", tid);
         if (rank == 0)
         {
             if (tid == 0)
@@ -795,10 +785,6 @@ int main(int argc, char *argv[])
                 end_final = chrono::system_clock::now();
                 chrono::duration<double> elapsed_ms = end_final - start_final;
                 std::cout << "Time to end program: " << 1000 * elapsed_ms.count() << " milliseconds\n";
-            }
-            else
-            {
-                // cout << "tid = " << tid << '\n';
             }
         }
     }
