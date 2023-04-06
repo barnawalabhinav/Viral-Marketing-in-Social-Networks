@@ -445,15 +445,16 @@ int main(int argc, char *argv[])
                         {
                             if (recvcounts[i] == 1)
                             {
-                                fout << 1 << endl;
+                                fout << 1 << " ";
                                 flag = 1;
                                 break;
                             }
                         }
                         if (flag == 0)
                         {
-                            fout << 0 << endl;
+                            fout << 0;
                         }
+                        fout << "\n";
                     }
                 }
                 else
