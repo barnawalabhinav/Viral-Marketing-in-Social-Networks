@@ -435,7 +435,11 @@ int main(int argc, char *argv[])
             else
             {
                 if (tid == 0)
-                    all_neighbors.clear();
+                {
+                    for (int i = 0; i < n; i++)
+                        if (all_neighbors.size() > i)
+                            all_neighbors[i].clear();
+                }
                 for (pair<int, int> e : edges)
                 {
 #pragma omp critical
