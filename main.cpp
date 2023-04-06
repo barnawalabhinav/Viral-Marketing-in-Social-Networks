@@ -11,7 +11,7 @@ typedef long long ll;
 
 #define deg(i) neighbors[i].size()
 #define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
-#define NUM_THREADS 1
+#define NUM_THREADS 2
 
 int get_edge_rank(int i, int j, int n, int size)
 {
@@ -751,28 +751,17 @@ int main(int argc, char *argv[])
                             auto it = comp.second.begin();
                             it++;
                             int hdsz = headohead[comp.first].size() + 1;
-                            int donesz = 0;
-                            bool proceed = true;
-                            while (proceed)
-                            {
-                                int tmpsz = 20000;
-                                if (comp.second.size() + hdsz - donesz <= 20000)
-                                {
-                                    proceed = false;
-                                    tmpsz = comp.second.size() + hdsz - donesz;
-                                }
-                                donesz += tmpsz;
-                                vector<int> tmp(tmpsz);
-                                int index = 0;
-                                tmp[index++] = hdsz;
-                                for (auto x : headohead[comp.first])
-                                    tmp[index++] = x;
-                                tmp[index++] = comp.first;
-                                for (; it != comp.second.end() && index < tmpsz; it++)
-                                    tmp[index++] = *it;
-                                MPI_Send(&index, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
-                                MPI_Send(tmp.data(), index, MPI_INT, 0, 7, MPI_COMM_WORLD);
-                            }
+                            int tmpsz = comp.second.size() + hdsz;
+                            vector<int> tmp(tmpsz);
+                            int index = 0;
+                            tmp[index++] = hdsz;
+                            for (auto x : headohead[comp.first])
+                                tmp[index++] = x;
+                            tmp[index++] = comp.first;
+                            for (; it != comp.second.end() && index < tmpsz; it++)
+                                tmp[index++] = *it;
+                            MPI_Send(&index, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
+                            MPI_Send(tmp.data(), index, MPI_INT, 0, 7, MPI_COMM_WORLD);
                         }
                         int c = -1;
                         MPI_Send(&c, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
