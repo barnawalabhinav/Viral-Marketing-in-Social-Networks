@@ -101,12 +101,25 @@ int main(int argc, char *argv[])
     bool proceed = false;
     int totalcount;
 
+    FILE *ptr = fopen(inputpath.c_str(), "rb"); // r for read, b for binary
+    FILE *header = fopen(headerpath.c_str(), "rb");
+
+    unsigned char buffer[4];
+    size_t read;
+
+    read = fread(buffer, sizeof(buffer), 1, ptr); // read 8 bytes to our buffer
+    int n = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+    read = fread(buffer, sizeof(buffer), 1, ptr); // read 8 bytes to our buffer
+    int m = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+
+    std::fclose(ptr);
+
     ofstream fout(outputpath, ios::out);
 
     vector<int> all_deletable;
     vector<int> recvbuf;
     set<pair<int, int>> all_edges;
-    vector<set<int>> all_neighbors;
+    vector<set<int>> all_neighbors(n);
     int *recvcounts = NULL;
 
 #pragma omp parallel num_threads(NUM_THREADS)
@@ -438,8 +451,7 @@ int main(int argc, char *argv[])
                 {
                     all_edges.clear();
                     for (int i = 0; i < n; i++)
-                        if (all_neighbors.size() > i)
-                            all_neighbors[i].clear();
+                        all_neighbors[i].clear();
                 }
 #pragma omp barrier
                 for (pair<int, int> e : edges)
@@ -457,14 +469,7 @@ int main(int argc, char *argv[])
                     {
 #pragma omp critical
                         {
-                            if (all_neighbors.size() > i)
-                                all_neighbors[i].insert(j);
-                            else
-                            {
-                                set<int> tmp;
-                                tmp.insert(j);
-                                all_neighbors.push_back(tmp);
-                            }
+                            all_neighbors[i].insert(j);
                             // cout << i << " " << j << "\n";
                         }
                     }
