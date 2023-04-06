@@ -475,7 +475,7 @@ int main(int argc, char *argv[])
                     }
                 }
 #pragma omp barrier
-                printf("HI!\n");
+                // printf("HI!\n");
                 if (tid == 0)
                 {
                     vector<int> head(n, -1);
@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
                     queue<int> trav;
                     auto it = all_edges.begin();
                     set<int> all_heads;
-                    printf("STARTED BFS\n");
+                    // printf("STARTED BFS\n");
 
                     while (true)
                     {
@@ -542,7 +542,7 @@ int main(int argc, char *argv[])
                         }
                         connected_comps.insert({tmp_head, grp_verts});
                     }
-                    printf("Rank %d: \n\nFINISHED BFS\n", rank);
+                    // printf("Rank %d: \n\nFINISHED BFS\n", rank);
 
                     int num_stop = rank;
                     vector<int> tmp_conn(2 * n);
@@ -673,12 +673,12 @@ int main(int argc, char *argv[])
                         else
                         {
                             // /************** CALCULATING INFLUENCER SEQUENTIALLY **************
-                            map<int, int> *head_id = new map<int, int>();
+                            map<int, int> head_id;
                             int id = 0;
                             for (auto grp : head_comps)
                             {
                                 for (int hd : grp)
-                                    (*head_id)[hd] = id;
+                                    head_id[hd] = id;
                                 id++;
                             }
 
@@ -687,10 +687,10 @@ int main(int argc, char *argv[])
                             for (int vt = 0; vt < n; vt++)
                             {
                                 if (head[vt] != -1)
-                                    conn_head_ids[vt].insert((*head_id)[head[vt]]);
+                                    conn_head_ids[vt].insert(head_id[head[vt]]);
                                 for (int i : neighbors[vt])
                                     if (head[i] != -1)
-                                        conn_head_ids[vt].insert((*head_id)[head[i]]);
+                                        conn_head_ids[vt].insert(head_id[head[i]]);
                                 if (conn_head_ids[vt].size() >= task_p)
                                     influencer.push_back(vt);
                             }
