@@ -628,7 +628,7 @@ int main(int argc, char *argv[])
                             }
                         }
 
-                        set<set<int>> head_comps;
+                        vector<set<int>> head_comps;
                         vector<int> visited(n);
                         queue<int> trav;
                         // auto it = all_heads.begin();
@@ -661,12 +661,12 @@ int main(int argc, char *argv[])
                                     }
                                 }
                             }
-                            head_comps.insert(grp_heads);
+                            head_comps.push_back(grp_heads);
                         }
 
                         if (taskid == 1)
                         {
-                            map<int, int> vis;
+                            vector<int> vis(n, 0);
                             if (head_comps.size() == 0)
                                 fout << 0 << endl;
                             else
@@ -693,7 +693,7 @@ int main(int argc, char *argv[])
                         else
                         {
                             // /************** CALCULATING INFLUENCER SEQUENTIALLY **************
-                            map<int, int> head_id;
+                            vector<int> head_id(n, -1);
                             int id = 0;
                             for (auto grp : head_comps)
                             {
@@ -726,7 +726,7 @@ int main(int argc, char *argv[])
                                         fout << in_vt << " ";
                                     else
                                     {
-                                        map<int, int> vis;
+                                        vector<int> vis(n, 0);
                                         fout << in_vt << "\n";
                                         auto itr = head_comps.begin();
                                         for (int i = 0; i < z; i++, itr++)
@@ -749,8 +749,6 @@ int main(int argc, char *argv[])
                     {
                         for (auto comp : connected_comps)
                         {
-                            auto it = comp.second.begin();
-                            it++;
                             int hdsz = headohead[comp.first].size() + 1;
                             int tmpsz = comp.second.size() + hdsz;
                             vector<int> tmp(tmpsz);
@@ -758,8 +756,7 @@ int main(int argc, char *argv[])
                             tmp[index++] = hdsz;
                             for (auto x : headohead[comp.first])
                                 tmp[index++] = x;
-                            tmp[index++] = comp.first;
-                            for (; it != comp.second.end() && index < tmpsz; it++)
+                            for (auto it = comp.second.begin(); it != comp.second.end() && index < tmpsz; it++)
                                 tmp[index++] = *it;
                             MPI_Send(&index, 1, MPI_INT, 0, 6, MPI_COMM_WORLD);
                             MPI_Send(tmp.data(), index, MPI_INT, 0, 7, MPI_COMM_WORLD);
