@@ -434,6 +434,8 @@ int main(int argc, char *argv[])
             }
             else
             {
+                if (tid == 0)
+                    all_neighbors.clear();
                 for (pair<int, int> e : edges)
                 {
 #pragma omp critical
