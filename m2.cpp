@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
     vector<int> all_deletable;
     vector<int> recvbuf;
     set<pair<int, int>> all_edges;
+    vector<set<int>> all_filtered(n);
     vector<set<int>> all_neighbors(n);
     int *recvcounts = NULL;
 
@@ -172,7 +173,6 @@ int main(int argc, char *argv[])
                         p += 4;
                         (neighbors)[node].insert(nodej);
                         (filtered_neighbors)[node].insert(nodej);
-
                         // Assign edges to even and smaller (if both even) and larger (if both odd) nodes only
                         if (node & 1)
                         {
@@ -245,8 +245,31 @@ int main(int argc, char *argv[])
         // /************ FOR INFLUENCER COMPUTATION ************
 
         /*TODO : add this to influencer in the end*/
-        if (taskid == 2 && rank == 0)
+        if (tid == 0 && taskid == 2 && rank == 0)
         {
+            for (int nd = 0; nd < n; ++nd)
+            {
+                int tmp_p = 0;
+                fseek(header, 4 * nd, SEEK_SET);
+                read = fread(buffer, sizeof(buffer), 1, header);
+
+                offset = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+                fseek(ptr, offset + 4, SEEK_SET);
+                read = fread(buffer, sizeof(buffer), 1, ptr);
+
+                degi = (buffer[0] & 0xFF) | ((buffer[1] & 0xFF) << 8) | ((buffer[2] & 0xFF) << 16) | ((buffer[3] & 0xFF) << 24);
+
+                unsigned char *buf = (unsigned char *)malloc(degi * sizeof(int));
+                read = fread(buf, degi * sizeof(int), 1, ptr);
+
+                for (int j = 0; j < degi; ++j)
+                {
+                    nodej = (buf[tmp_p] & 0xFF) | ((buf[tmp_p + 1] & 0xFF) << 8) | ((buf[tmp_p + 2] & 0xFF) << 16) | ((buf[tmp_p + 3] & 0xFF) << 24);
+                    tmp_p += 4;
+                    all_neighbors[nd].insert(nodej);
+                }
+                std::free(buf);
+            }
         }
         // ************ FOR INFLUENCER COMPUTATION ************/
 
@@ -451,7 +474,7 @@ int main(int argc, char *argv[])
                 {
                     all_edges.clear();
                     for (int i = 0; i < n; i++)
-                        all_neighbors[i].clear();
+                        all_filtered[i].clear();
                 }
 #pragma omp barrier
                 for (pair<int, int> e : edges)
@@ -469,7 +492,7 @@ int main(int argc, char *argv[])
                     {
 #pragma omp critical
                         {
-                            all_neighbors[i].insert(j);
+                            all_filtered[i].insert(j);
                             // cout << i << " " << j << "\n";
                         }
                     }
@@ -531,7 +554,7 @@ int main(int argc, char *argv[])
                                 extr_vert[node_rank].push_back(tmp_head);
                             }
 
-                            for (int j : all_neighbors[i])
+                            for (int j : all_filtered[i])
                             {
                                 if (visited[j] == 0)
                                 {
@@ -688,7 +711,7 @@ int main(int argc, char *argv[])
                             {
                                 if (head[vt] != -1)
                                     conn_head_ids[vt].insert(head_id[head[vt]]);
-                                for (int i : neighbors[vt])
+                                for (int i : all_neighbors[vt])
                                     if (head[i] != -1)
                                         conn_head_ids[vt].insert(head_id[head[i]]);
                                 if (conn_head_ids[vt].size() >= task_p)

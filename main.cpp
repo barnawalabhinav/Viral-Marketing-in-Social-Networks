@@ -687,7 +687,6 @@ int main(int argc, char *argv[])
                         while (true)
                         {
                             MPI_Status stat;
-                            set<int> *recv_conn_comp = new set<int>();
                             int len;
                             MPI_Recv(&len, 1, MPI_INT, MPI_ANY_SOURCE, 6, MPI_COMM_WORLD, &stat);
                             if (len == -1)

@@ -3,9 +3,9 @@
 
 SEQCC=g++
 MPICC=mpiCC
-MPIRUN=mpirun -np 4
+MPIRUN=mpirun -np 2
 CFLAGS=-std=c++17 -Wall -O3 -fopenmp
-MPI_MAIN=main.cpp
+MPI_MAIN=m2.cpp
 SEQ_MAIN=ap_seq.cpp
 
 ARGS-1 = \
