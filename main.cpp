@@ -11,7 +11,7 @@ typedef long long ll;
 
 #define deg(i) neighbors[i].size()
 #define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
-#define NUM_THREADS 2
+#define NUM_THREADS 1
 
 int get_edge_rank(int i, int j, int n, int size)
 {
@@ -628,7 +628,7 @@ int main(int argc, char *argv[])
                         }
 
                         set<set<int>> head_comps;
-                        map<int, int> visited;
+                        vector<int> visited(n);
                         queue<int> trav;
                         // auto it = all_heads.begin();
                         int it = 0, sz = all_heads.size();
