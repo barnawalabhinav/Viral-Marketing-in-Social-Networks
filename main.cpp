@@ -11,7 +11,7 @@ typedef long long ll;
 
 #define deg(i) neighbors[i].size()
 #define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
-#define NUM_THREADS 4
+#define NUM_THREADS 2
 
 int get_edge_rank(int i, int j, int n, int size)
 {
@@ -36,7 +36,7 @@ int get_edge_rank(int i, int j, int n, int size)
 int main(int argc, char *argv[])
 {
     /***************** PARSE CMD LINE ARGS *****************/
-
+    printf("NUM Threads = %d\n", NUM_THREADS);
     int taskid = 1;
     int task_p = 1;
     int verbose = 0;
@@ -89,6 +89,8 @@ int main(int argc, char *argv[])
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    std::mutex dlock, elock, flock;
 
     /***************** GET INPUT FROM FILE *****************/
 
@@ -498,11 +500,11 @@ int main(int argc, char *argv[])
                     vector<int> head(n, -1);
                     map<int, set<int>> headohead;
                     vector<vector<int>> extr_vert(size);
-                    map<int, set<int>> connected_comps;
-                    map<int, int> visited;
+                    map<int, vector<int>> connected_comps;
+                    vector<int> visited(n, 0);
                     queue<int> trav;
                     auto it = all_edges.begin();
-                    set<int> all_heads;
+                    vector<int> all_heads;
 
                     while (true)
                     {
@@ -512,7 +514,7 @@ int main(int argc, char *argv[])
                             break;
 
                         int tmp_head = -1;
-                        set<int> grp_verts;
+                        vector<int> grp_verts;
                         if (visited[(*it).first] == 0)
                         {
                             trav.push((*it).first);
@@ -530,13 +532,13 @@ int main(int argc, char *argv[])
                             continue;
 
                         if (rank == 0)
-                            all_heads.insert(tmp_head);
+                            all_heads.push_back(tmp_head);
 
                         while (trav.size() > 0)
                         {
                             int i = trav.front();
                             trav.pop();
-                            grp_verts.insert(i);
+                            grp_verts.push_back(i);
                             visited[i] = 1;
 
                             int node_rank = get_node_rank(i);
@@ -612,14 +614,14 @@ int main(int argc, char *argv[])
 
                                 for (int id = 1; id < vec[0]; id++)
                                 {
-                                    all_heads.insert(vec[id]);
+                                    all_heads.push_back(vec[id]);
                                     headohead[vec[vec[0]]].insert(vec[id]);
                                     headohead[vec[id]].insert(vec[vec[0]]);
                                 }
-                                all_heads.insert(vec[1]);
+                                all_heads.push_back(vec[1]);
                                 for (int ind = vec[0]; ind < len; ind++)
                                 {
-                                    connected_comps[vec[vec[0]]].insert(vec[ind]);
+                                    connected_comps[vec[vec[0]]].push_back(vec[ind]);
                                     head[vec[ind]] = vec[vec[0]];
                                 }
                             }
@@ -628,18 +630,20 @@ int main(int argc, char *argv[])
                         set<set<int>> head_comps;
                         map<int, int> visited;
                         queue<int> trav;
-                        auto it = all_heads.begin();
+                        // auto it = all_heads.begin();
+                        int it = 0, sz = all_heads.size();
 
                         while (true)
                         {
-                            while (it != all_heads.end() && visited[*it] == 1)
+                            // while (it != all_heads.end() && visited[*it] == 1)
+                            while (it < sz && visited[all_heads[it]] == 1)
                                 it++;
-                            if (it == all_heads.end())
+                            if (it == sz)
                                 break;
 
                             set<int> grp_heads;
-                            trav.push(*it);
-                            visited[*it] = 1;
+                            trav.push(all_heads[it]);
+                            visited[all_heads[it]] = 1;
                             while (trav.size() > 0)
                             {
                                 int i = trav.front();
