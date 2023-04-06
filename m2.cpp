@@ -11,7 +11,7 @@ typedef long long ll;
 
 #define deg(i) neighbors[i].size()
 #define get_node_rank(i) ((i >= (n / size) * (size - 1)) ? size - 1 : i / (n / size))
-#define NUM_THREADS 1
+#define NUM_THREADS 4
 
 int get_edge_rank(int i, int j, int n, int size)
 {
@@ -436,19 +436,21 @@ int main(int argc, char *argv[])
             {
                 if (tid == 0)
                 {
+                    all_edges.clear();
                     for (int i = 0; i < n; i++)
                         if (all_neighbors.size() > i)
                             all_neighbors[i].clear();
                 }
+#pragma omp barrier
                 for (pair<int, int> e : edges)
                 {
 #pragma omp critical
                     {
                         all_edges.insert(e);
-                        cout << e.first << " " << e.second << endl;
+                        // cout << e.first << " " << e.second << endl;
                     }
                 }
-                cout << "----------------- k = " << k << endl;
+                // cout << "----------------- k = " << k << endl;
                 for (int i = 0; i < n; i++)
                 {
                     for (int j : (filtered_neighbors)[i])
@@ -463,7 +465,7 @@ int main(int argc, char *argv[])
                                 tmp.insert(j);
                                 all_neighbors.push_back(tmp);
                             }
-                            cout << i << " " << j << "\n";
+                            // cout << i << " " << j << "\n";
                         }
                     }
                 }
@@ -479,6 +481,7 @@ int main(int argc, char *argv[])
                     queue<int> trav;
                     auto it = all_edges.begin();
                     set<int> all_heads;
+                    printf("STARTED BFS\n");
 
                     while (true)
                     {
@@ -534,6 +537,7 @@ int main(int argc, char *argv[])
                         }
                         connected_comps.insert({tmp_head, grp_verts});
                     }
+                    printf("Rank %d: \n\nFINISHED BFS\n", rank);
 
                     int num_stop = rank;
                     vector<int> tmp_conn(2 * n);
