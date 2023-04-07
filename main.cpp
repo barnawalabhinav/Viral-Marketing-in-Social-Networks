@@ -1,5 +1,3 @@
-// TODO : Change filesize > Maxfilesize to filesize < Maxfilesize
-
 #include <bits/stdc++.h>
 #include <mpi.h>
 #include <omp.h>
@@ -36,7 +34,6 @@ int get_edge_rank(int i, int j, int n, int size)
 int main(int argc, char *argv[])
 {
     /***************** PARSE CMD LINE ARGS *****************/
-    printf("NUM Threads = %d\n", NUM_THREADS);
     int taskid = 1;
     int task_p = 1;
     int verbose = 0;
@@ -246,7 +243,6 @@ int main(int argc, char *argv[])
 
         // /************ FOR INFLUENCER COMPUTATION ************
 
-        /*TODO : add this to influencer in the end*/
         if (tid == 0 && taskid == 2 && rank == 0)
         {
             for (int nd = 0; nd < n; ++nd)
@@ -275,7 +271,6 @@ int main(int argc, char *argv[])
         }
         // ************ FOR INFLUENCER COMPUTATION ************/
 
-        // printf("tid = %d, size = %d\n", tid, (int)edges.size());
         for (pair<int, int> edge : edges)
         {
             int node1 = edge.first;
@@ -312,7 +307,6 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        // printf("tid = %d\n", tid);
         std::fclose(ptr);
         std::fclose(header);
 
@@ -366,7 +360,6 @@ int main(int argc, char *argv[])
                 }
 
 #pragma omp barrier
-                // printf("tid = %d, all_de size = %d, k=%d, edges size = %d\n", tid, all_deletable.size(), k, edges.size());
                 if (tid == 0)
                 {
                     int sendcount = (int)all_deletable.size(), recvcounts[size], displs[size];
@@ -424,7 +417,6 @@ int main(int argc, char *argv[])
             }
 
 #pragma omp barrier
-            // printf("tid = %d, k = %d\n", tid, k);
             if (taskid == 1 && verbose == 0)
             {
                 if (rank == 0)
@@ -435,7 +427,6 @@ int main(int argc, char *argv[])
                         if_present = 1;
                     }
 #pragma omp barrier
-                    // printf("%d, k= %d, rank = %d\n", if_present, k, rank);
                     if (tid == 0)
                     {
                         recvcounts = (int *)malloc(size * sizeof(int));
@@ -628,12 +619,10 @@ int main(int argc, char *argv[])
                         vector<set<int>> head_comps;
                         vector<int> visited(n);
                         queue<int> trav;
-                        // auto it = all_heads.begin();
                         int it = 0, sz = all_heads.size();
 
                         while (true)
                         {
-                            // while (it != all_heads.end() && visited[*it] == 1)
                             while (it < sz && visited[all_heads[it]] == 1)
                                 it++;
                             if (it == sz)
@@ -765,15 +754,6 @@ int main(int argc, char *argv[])
                 }
             }
 #pragma omp barrier
-        }
-        if (rank == 0)
-        {
-            if (tid == 0)
-            {
-                end_final = chrono::system_clock::now();
-                chrono::duration<double> elapsed_ms = end_final - start_final;
-                std::cout << "Time to end program: " << 1000 * elapsed_ms.count() << " milliseconds\n";
-            }
         }
     }
     MPI_Finalize();
