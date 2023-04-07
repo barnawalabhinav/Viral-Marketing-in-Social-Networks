@@ -3,14 +3,14 @@
 
 SEQCC=g++
 MPICC=mpiCC
-MPIRUN=mpirun -np 2
+MPIRUN=mpirun -np 3
 CFLAGS=-std=c++17 -Wall -O3 -fopenmp
 MPI_MAIN=main.cpp
 SEQ_MAIN=ap_seq.cpp
 
 ARGS-1 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=0 \
 	--endk=5 \
 	--inputpath=A2/test-1/test-input--1.gra \
@@ -19,7 +19,7 @@ ARGS-1 = \
 
 ARGS-2 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=5 \
 	--inputpath=A2/test-2/test-input--2.gra \
@@ -28,7 +28,7 @@ ARGS-2 = \
 
 ARGS0 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=10 \
 	--inputpath=A2/test0/test-input-0.gra \
@@ -37,7 +37,7 @@ ARGS0 = \
 
 ARGS1 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=10 \
 	--inputpath=A2/test1/test-input-1.gra \
@@ -46,7 +46,7 @@ ARGS1 = \
 
 ARGS2 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=8 \
 	--inputpath=A2/test2/test-input-2.gra \
@@ -55,7 +55,7 @@ ARGS2 = \
 
 ARGS3 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=5 \
 	--inputpath=A2/test3/test-input-3.gra \
@@ -64,7 +64,7 @@ ARGS3 = \
 
 ARGS4 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=6 \
 	--inputpath=A2/test4/test-input-4.gra \
@@ -73,7 +73,7 @@ ARGS4 = \
 
 ARGS5 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=8 \
 	--inputpath=A2/test5/test-input-5.gra \
@@ -82,7 +82,7 @@ ARGS5 = \
 
 ARGS6 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=29 \
 	--inputpath=A2/test6/test-input-6.gra \
@@ -91,7 +91,7 @@ ARGS6 = \
 
 ARGS7 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=10 \
 	--endk=25 \
 	--inputpath=A2/test7/test-input-7.gra \
@@ -100,7 +100,7 @@ ARGS7 = \
 
 ARGS8 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=2 \
 	--endk=6 \
 	--inputpath=A2/test8/test-input-8.gra \
@@ -109,7 +109,7 @@ ARGS8 = \
 
 ARGS9 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=3 \
 	--endk=3 \
 	--inputpath=A2/test9/test-input-9.gra \
@@ -118,7 +118,7 @@ ARGS9 = \
 
 ARGS10 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=3 \
 	--endk=3 \
 	--inputpath=A2/test10/test-input-10.gra \
@@ -129,7 +129,7 @@ ARGS10 = \
 
 ARGS311 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=3 \
 	--endk=10 \
 	--inputpath=A3/test1/test-input-1.gra \
@@ -138,7 +138,7 @@ ARGS311 = \
 
 ARGS312 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=3 \
 	--endk=12 \
 	--inputpath=A3/test2/test-input-2.gra \
@@ -147,7 +147,7 @@ ARGS312 = \
 
 ARGS313 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=4 \
 	--endk=8 \
 	--inputpath=A3/test3/test-input-3.gra \
@@ -156,7 +156,7 @@ ARGS313 = \
 
 ARGS314 = \
 	--taskid=1 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=2 \
 	--endk=3 \
 	--inputpath=A3/test4/test-input-4.gra \
@@ -167,7 +167,7 @@ ARGS314 = \
 
 ARGS321 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--endk=3 \
 	--inputpath=A3/test1/test-input-1.gra \
 	--headerpath=A3/test1/test-header-1.dat \
@@ -176,7 +176,7 @@ ARGS321 = \
 
 ARGS322 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=3 \
 	--inputpath=A3/test2/test-input-2.gra \
@@ -186,7 +186,7 @@ ARGS322 = \
 
 ARGS323 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=3 \
 	--inputpath=A3/test3/test-input-3.gra \
@@ -196,7 +196,7 @@ ARGS323 = \
 
 ARGS324 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=2 \
 	--inputpath=A3/test4/test-input-4.gra \
@@ -206,7 +206,7 @@ ARGS324 = \
 
 ARGS326 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=4 \
 	--inputpath=A3/test6/test-input-6.gra \
@@ -216,7 +216,7 @@ ARGS326 = \
 
 ARGS327 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=3 \
 	--inputpath=A3/test7/test-input-7.gra \
@@ -226,7 +226,7 @@ ARGS327 = \
 
 ARGS328 = \
 	--taskid=2 \
-	--verbose=1 \
+	--verbose=0 \
 	--startk=1 \
 	--endk=5 \
 	--inputpath=A3/test8/test-input-8.gra \
@@ -355,15 +355,15 @@ check4: verify.o
 check5: verify.o
 	./verify.o A2/test5/test-output-5.txt A2/test5/output5_verbose.txt
 check6: verify.o
-	./verify.o A2/test6/test-output-6.txt A2/test6/output6_verbose.txt
+	./verify.o A2/test6/test-output-6.txt A2/test6/output6.txt
 check7: verify.o
-	./verify.o A2/test7/test-output-7.txt A2/test7/output7_verbose.txt
+	./verify.o A2/test7/test-output-7.txt A2/test7/output7.txt
 check8: verify.o
-	./verify.o A2/test8/test-output-8.txt A2/test8/output8_verbose.txt
+	./verify.o A2/test8/test-output-8.txt A2/test8/output8.txt
 check9: verify.o
-	./verify.o A2/test9/test-output-9.txt A2/test9/output9_verbose.txt
+	./verify.o A2/test9/test-output-9.txt A2/test9/output9.txt
 check10: verify.o
-	./verify.o A2/test10/test-output-10.txt A2/test10/output10_verbose.txt
+	./verify.o A2/test10/test-output-10.txt A2/test10/output10.txt
 
 check311: verify.o
 	./verify.o A3/test1/task1-output-1.txt A3/test1/task1_output1_verbose.txt
@@ -383,11 +383,11 @@ check323: verify.o
 check324: verify.o
 	./verify.o A3/test4/task2-output-4.txt A3/test4/task2_output4_verbose.txt
 check326: verify.o
-	./verify.o A3/test6/task2-output-6.txt A3/test6/task2_output6_verbose.txt
+	./verify.o A3/test6/task2-output-6.txt A3/test6/task2_output6.txt
 check327: verify.o
-	./verify.o A3/test7/task2-output-7.txt A3/test7/task2_output7_verbose.txt
+	./verify.o A3/test7/task2-output-7.txt A3/test7/task2_output7.txt
 check328: verify.o
-	./verify.o A3/test8/task2-output-8.txt A3/test8/task2_output8_verbose.txt
+	./verify.o A3/test8/task2-output-8.txt A3/test8/task2_output8.txt
 
 
 check21: check0 check1 check2 check3 check4 check5
