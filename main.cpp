@@ -87,13 +87,7 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    std::mutex dlock, elock, flock;
-
     /***************** GET INPUT FROM FILE *****************/
-
-    chrono::time_point<std::chrono::system_clock> start, end, start_final, end_final;
-    start = std::chrono::system_clock::now();
-    start_final = std::chrono::system_clock::now();
 
     int size_threads = NUM_THREADS;
     int if_present = 0;
