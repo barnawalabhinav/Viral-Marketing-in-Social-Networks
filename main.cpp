@@ -451,10 +451,7 @@ int main(int argc, char *argv[])
                             }
                         }
                         if (flag == 0)
-                        {
-                            fout << 0;
-                        }
-                        fout << "\n";
+                            fout << 0 << " ";
                     }
                 }
                 else
